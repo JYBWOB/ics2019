@@ -64,7 +64,7 @@ static int cmd_si(char *args) {
     cpu_exec(1);
     return 0;
   }
-  // 有参数，需判断是否为整数
+  // 有参数，获取
   int n;
   if(sscanf(args, "%d", &n) == EOF) {
     printf("please input a number as args\n");
