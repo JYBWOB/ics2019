@@ -8,6 +8,7 @@
 #include <readline/history.h>
 
 void cpu_exec(uint64_t);
+void isa_reg_display();
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -49,7 +50,7 @@ static struct {
 
   /* TODO: Add more commands */
   {"si", "Execute N instructions, the default number is 1", cmd_si},
-
+  {"info", "Print the regsters or watchpoints", cmd_info},
 };
 
 /* 单步执行si */
@@ -66,6 +67,26 @@ static int cmd_si(char *args) {
   }
   else {
     cpu_exec(n);
+  }
+  return 0;
+}
+/* 打印寄存器/监视点状态 */
+static int cmd_info(char *args) {
+  // 没有参数，则默认打印寄存器信息
+  if(args == NULL) {
+    isa_reg_display();
+    return 0;
+  }
+  switch(*args) {
+    case 'r':
+      isa_reg_display();
+      break;
+    case 'w':
+      printf("Will be implemented in pa1.3");
+      break;
+    default:
+      printf("Unknown Type to print");
+      break;
   }
   return 0;
 }
