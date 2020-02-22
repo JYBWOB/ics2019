@@ -42,7 +42,7 @@ void reg_test() {
 
 void isa_reg_display() {
   for(int index = 0; index < 8; index++)
-    printf("%s\t%d\t\t%s\t%d\t\t%s\t%d\n", regsl[index], reg_l(index), regsw[index], reg_w(index), regsb[index], reg_b(index));
+    printf("|%-5s\t%-15d|\t\t|%-5s\t%-15d|\t\t|%-5s\t%-15d|\n", regsl[index], reg_l(index), regsw[index], reg_w(index), regsb[index], reg_b(index));
   printf("eip\t%d\n", cpu.pc);
 }
 
