@@ -40,6 +40,7 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
+static int cmd_scan(char *args);
 
 static struct {
   char *name;
@@ -53,6 +54,7 @@ static struct {
   /* TODO: Add more commands */
   {"si", "Execute N instructions, the default number is 1", cmd_si},
   {"info", "Print the regsters or watchpoints", cmd_info},
+  {"x", "Scan the memory to find the value", cmd_scan},
 };
 
 /* 单步执行si */
@@ -65,7 +67,7 @@ static int cmd_si(char *args) {
   // 有参数，需判断是否为整数
   int n;
   if(sscanf(args, "%d", &n) == EOF) {
-    printf("please input a number!");
+    printf("please input a number as args\n");
   }
   else {
     cpu_exec(n);
@@ -84,13 +86,44 @@ static int cmd_info(char *args) {
       isa_reg_display();
       break;
     case 'w':
-      printf("Will be implemented in pa1.3");
+      printf("Will be implemented in pa1.3\n");
       break;
     default:
-      printf("Unknown Type to print");
+      printf("Unknown Type to print\n");
       break;
   }
   return 0;
+}
+
+// 扫描内存
+static int cmd_scan(char *args) {
+  // 参数必须存在
+  if(args == NULL)
+	{
+		printf("Unknown size and address to scan\n");
+		return 0;
+	}
+  // 参数的最末位置
+  char* args_end = args + strlen(args);
+  
+  // 截取第一个参数
+  char *size = strtok(args, " ");
+  int len = -1;
+  if(sscanf(size, "%d", &len) == EOF || len < 0) {
+    printf("please input the size to scan\n");
+    return 0;
+  }
+  // 判断第二个计算式存在
+  char *addr = size + strlen(size) + 1;
+  if (addr >= args_end) { 
+    printf("Please input the address to scan\n");
+    return 0;
+  }
+  // TODO: 计算表达式 输出结果
+  // 目前没有实现表达式计算，先以常数地址代替
+  for(int i = 0; i < len; i++)
+    printf("%010X\t", vaddr_read(result + i * 4, 4));
+  printf("\n");
 }
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
