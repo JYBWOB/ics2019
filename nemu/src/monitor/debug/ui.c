@@ -48,8 +48,27 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
+  {"si", "Execute N instructions, the default number is 1", cmd_si},
 
 };
+
+/* 单步执行si */
+static int cmd_si(char *args) {
+  // 没有参数，则默认为1步
+  if(args == NULL) {
+    cpu_exec(1);
+    return 0;
+  }
+  // 有参数，需判断是否为整数
+  int n;
+  if(sscanf(args, "%d", &n) == EOF) {
+    printf("please input a number!");
+  }
+  else {
+    cpu_exec(n);
+  }
+  return 0;
+}
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
 
