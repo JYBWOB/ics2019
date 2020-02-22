@@ -121,9 +121,12 @@ static int cmd_scan(char *args) {
   }
   // TODO: 计算表达式 输出结果
   // 目前没有实现表达式计算，先以常数地址代替
+  int result = 0x100000;
   for(int i = 0; i < len; i++)
     printf("%010X\t", vaddr_read(result + i * 4, 4));
   printf("\n");
+
+  return 0;
 }
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
