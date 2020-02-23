@@ -340,6 +340,6 @@ uint32_t expr(char *e, bool *success) {
  		}
   }
 	*success = true;
-	//printf("success = %d\n", *success);
+	printf("success = %d\n", *success);
 	return eval(0, nr_token-1, success);
 }
