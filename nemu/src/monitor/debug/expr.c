@@ -6,12 +6,14 @@
 #include <sys/types.h>
 #include <regex.h>
 
+uint32_t isa_reg_str2val(const char *s, bool *success);
+
 enum {
   TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-  TK_NUMBER, TK_REGISTER, TK_MINUS, TK_POINTOR, TK_MINUS,
-  TK_NOTEQ, TK_AND, TK_OR
+  TK_NUMBER, TK_REGISTER, TK_MINUS, TK_POINTOR,
+  TK_NOTEQ, TK_AND, TK_OR, TK_HEX
 };
 
 static struct rule {
@@ -26,11 +28,11 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},         // equal
-  {"!=", TK_NEQ},       // not equal
+  {"!=", TK_NOTEQ},       // not equal
   {"&&", TK_AND},       // and
   {"\\|\\|", TK_OR},    // or
   {"[0-9]+", TK_NUMBER},       // number
-  // {"0[xX][0-9a-fA-F]+", TK_HEX},        // hex number
+  {"0[xX][0-9a-fA-F]+", TK_HEX},        // hex number
   {"\\$(eax|EAX|ebx|EBX|ecx|ECX|edx|EDX|ebp|EBP|esp|ESP|esi|ESI|edi|EDI|eip|EIP)", TK_REGISTER}, // register
   {"\\$(([ABCD][HLX])|([abcd][hlx]))", TK_REGISTER}, //register
   {"!", '!'}, // not
@@ -67,9 +69,24 @@ void init_regex() {
   }
 }
 
+// 优先级，为计算时提供方便
+enum {
+  OP_LV0 = 0, // number, register
+  OP_LV1 = 10, // ()
+  OP_LV2_1 = 21, // unary +, -
+  OP_LV2_2 = 22, // deference *
+  OP_LV3 = 30, // *, /, %
+  OP_LV4 = 40, // +, -
+  OP_LV7 = 70, // ==, !=
+  OP_LV11 = 110, // &&
+  OP_LV12 = 120, // ||
+};
+
+
 typedef struct token {
   int type;
   char str[32];
+  int precedence;  // 为设置优先级，此处每个token都应有对应值
 } Token;
 
 static Token tokens[32] __attribute__((used)) = {};
@@ -98,22 +115,59 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
+        // 要给token设置优先级
         switch (rules[i].token_type) {
-          case TK_NOTYP:
+          case TK_NOTYPE: break;
+          case '+':
+          case '-':
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].precedence = OP_LV4;
+            ++nr_token;
+            break;
+          case '*':
+          case '/':
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].precedence = OP_LV3;
+            ++nr_token;
+            break;
+          case '(':
+          case ')':
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].precedence = OP_LV1;
+            ++nr_token;
+            break;
+          case TK_NUMBER:
+            tokens[nr_token].type = rules[i].token_type;
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].precedence = OP_LV0;
+            ++nr_token;
             break;
           case TK_REGISTER:
             tokens[nr_token].type = rules[i].token_type;
-            // substr_start+1是因为寄存器开始有个$符号
-						strncpy (tokens[nr_token].str,substr_start + 1,substr_len-1);
-						token [nr_token].str[substr_len-1]='\0';
-						nr_token ++;
-						break; 
-          default:
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].precedence = OP_LV0;
+            ++nr_token;
+            break;
+          case TK_EQ:
+          case TK_NOTEQ:
             tokens[nr_token].type = rules[i].token_type;
-            strncpy (token[nr_token].str,substr_start,substr_len);
-            token[nr_token].str[substr_len]='\0';
-						nr_token ++;
-						break;
+            tokens[nr_token].precedence = OP_LV7;
+            ++nr_token;
+            break;
+          case TK_AND:
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].precedence = OP_LV11;
+            ++nr_token;
+            break;
+          case TK_OR:
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].precedence = OP_LV12;
+            ++nr_token;
+            break;
+          default:
+            Log("Unhandled token found!\n");
+            assert(0);
+            break;
         }
 
         break;
@@ -190,7 +244,20 @@ uint32_t eval(int p, int q, bool *success) {
       *success = false;
       return 0;
     }
-
+    int op = 0;
+    int cur = 0;
+    int max_precedence = -1;
+    for (int i = p; i <= q; ++i) {
+      if (tokens[i].type == '(') {
+        ++cur;
+      } else if (tokens[i].type == ')') {
+        --cur;
+      }
+      if (cur == 0 && tokens[i].precedence >= max_precedence) {
+        max_precedence = tokens[i].precedence;
+        op = i;
+      }
+    }
     uint32_t val1 = 0;
     if (tokens[op].type != TK_POINTOR && tokens[op].type != TK_MINUS) {
       val1 = eval(p, op - 1, success);
@@ -236,8 +303,20 @@ uint32_t eval(int p, int q, bool *success) {
         assert(0);
     }
   }
+  return -1;
 }
 
+bool check_unary(int token_type) {
+  return (
+    token_type == '('
+    || token_type == '+'
+    || token_type == '-'
+    || token_type == '*'
+    || token_type == '/'
+    || token_type == TK_MINUS
+    || token_type == TK_POINTOR
+  );
+}
 
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -249,11 +328,13 @@ uint32_t expr(char *e, bool *success) {
   int i;
 	for (i = 0;i < nr_token; i ++) { //识别负数和指针
 		//printf("REGISTER: %d\n", token[i].type == REGISTER);
- 		if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != NUMBER && tokens[i - 1].type != HEX && tokens[i - 1].type != REGISTER && tokens[i - 1].type != MARK && tokens[i - 1].type !=')'))) {
+ 		if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
 			tokens[i].type = TK_POINTOR;
+      tokens[i].precedence = OP_LV2_2;
 		}
-		if (tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != NUMBER && tokens[i - 1].type != HEX && tokens[i - 1].type != REGISTER && tokens[i - 1].type != MARK && tokens[i - 1].type !=')'))) {
+		if (tokens[i].type == '-' && (i == 0 || check_unary(tokens[i - 1].type))) {
 			tokens[i].type = TK_MINUS;
+      tokens[i].precedence = OP_LV2_1;
  		}
   }
 	*success = true;
