@@ -171,15 +171,16 @@ static bool make_token(char *e) {
             assert(0);
             break;
         }
-
         break;
       }
     }
 
+    printf("everything is ok 1");
     if (i == NR_REGEX) {
       printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
       return false;
     }
+    printf("everything is ok 2");
   }
 
   return true;
@@ -325,12 +326,13 @@ uint32_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
+  
+    printf("everything is ok 3");
 
   /* TODO: Insert codes to evaluate the expression. */
   int i;
 	for (i = 0;i < nr_token; i ++) { //识别负数和指针
 		//printf("REGISTER: %d\n", token[i].type == REGISTER);
-    printf(tokens[i].str);
  		if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
 			tokens[i].type = TK_POINTOR;
       tokens[i].precedence = OP_LV2_2;
@@ -341,6 +343,5 @@ uint32_t expr(char *e, bool *success) {
  		}
   }
 	*success = true;
-	printf("success = %d\n", *success);
 	return eval(0, nr_token-1, success);
 }
