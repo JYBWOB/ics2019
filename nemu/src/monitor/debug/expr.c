@@ -231,7 +231,9 @@ uint32_t eval(int p, int q, bool *success) {
         *success = false;
       }
     } else if (tokens[p].type == TK_REGISTER) {
+      printf("**********************\n");
       val = isa_reg_str2val(tokens[p].str + 1, success);
+      printf("**********************%x\n", val);
     }
     return val;
   } else if (check_parentheses(p, q, &error)) {
@@ -321,8 +323,6 @@ uint32_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
-
-  printf("***********************");
 
   /* TODO: Insert codes to evaluate the expression. */
   for (int i = 0; i < nr_token; ++i) {
