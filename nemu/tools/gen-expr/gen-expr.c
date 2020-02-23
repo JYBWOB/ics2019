@@ -11,7 +11,7 @@ static inline void gen_rand_expr() {
   switch (rand() % 3) {
     case 0: {
       char temp[25]; 
-      int ran = rand();
+      int ran = rand() % 10000;
       sprintf(temp, "%d", ran);
       strcat(buf, temp);
       break;
