@@ -121,6 +121,10 @@ static int cmd_scan(char *args) {
   }
   // TODO: 计算表达式 输出结果
   // 目前没有实现表达式计算，先以常数地址代替
+  
+
+  bool *e = false;
+  printf("%d\n", expr("(2056810607+(311588048)*((155358798/(1037229738)))*((109528855)))", e));
   int result = 0x100000;
   for(int i = 0; i < len; i++)
     printf("%010X\t", vaddr_read(result + i * 4, 4));
