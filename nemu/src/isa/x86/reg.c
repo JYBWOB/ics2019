@@ -53,6 +53,8 @@ uint32_t isa_reg_str2val(const char *s, bool *success) {
   }
   for (int i = 0; i < 8; ++i) {
     if (strcmp(reg_name(i, 4), s) == 0) {
+      
+      printf("al match\n");
       *success = true;
       return reg_l(i);
     }
@@ -61,7 +63,6 @@ uint32_t isa_reg_str2val(const char *s, bool *success) {
       return reg_w(i);
     }
     if (strcmp(reg_name(i, 1), s) == 0) {
-      printf("al match\n");
       *success = true;
       return reg_b(i);
     }
