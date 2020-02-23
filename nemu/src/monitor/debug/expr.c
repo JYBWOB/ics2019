@@ -7,10 +7,11 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ
+  TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-
+  TK_NUMBER, TK_REGISTER, TK_MINUS, TK_POINTOR, TK_MINUS,
+  TK_NOTEQ, TK_AND, TK_OR
 };
 
 static struct rule {
@@ -24,7 +25,23 @@ static struct rule {
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
-  {"==", TK_EQ}         // equal
+  {"==", TK_EQ},         // equal
+  {"!=", TK_NEQ},       // not equal
+  {"&&", TK_AND},       // and
+  {"\\|\\|", TK_OR},    // or
+  {"[0-9]+", TK_NUMBER},       // number
+  // {"0[xX][0-9a-fA-F]+", TK_HEX},        // hex number
+  {"\\$(eax|EAX|ebx|EBX|ecx|ECX|edx|EDX|ebp|EBP|esp|ESP|esi|ESI|edi|EDI|eip|EIP)", TK_REGISTER}, // register
+  {"\\$(([ABCD][HLX])|([abcd][hlx]))", TK_REGISTER}, //register
+  {"!", '!'}, // not
+  {"+", '+'}, // add
+  {"-", '-'}, // sub
+  {"*", '*'}, // mul
+  {"/", '/'}, // div
+  {">", '>'}, // greater
+  {"<", '<'}, // lower
+  {"\\(", '('}, // left bracket
+  {"\\)", ')'} // right bracket  
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -34,6 +51,8 @@ static regex_t re[NR_REGEX] = {};
 /* Rules are used for many times.
  * Therefore we compile them only once before any usage.
  */
+
+// 将正则表达式编译，写入re数组
 void init_regex() {
   int i;
   char error_msg[128];
@@ -80,7 +99,21 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+          case TK_NOTYP:
+            break;
+          case TK_REGISTER:
+            tokens[nr_token].type = rules[i].token_type;
+            // substr_start+1是因为寄存器开始有个$符号
+						strncpy (tokens[nr_token].str,substr_start + 1,substr_len-1);
+						token [nr_token].str[substr_len-1]='\0';
+						nr_token ++;
+						break; 
+          default:
+            tokens[nr_token].type = rules[i].token_type;
+            strncpy (token[nr_token].str,substr_start,substr_len);
+            token[nr_token].str[substr_len]='\0';
+						nr_token ++;
+						break;
         }
 
         break;
@@ -96,6 +129,116 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_parentheses(int p, int q, int* error) {
+  if (p >= q) {
+    *error = -1;
+    return false;
+  }
+  int match_cnt = 0;
+  for (int i = p; i <= q; ++i) {
+    if (tokens[i].type == '(') {
+      ++match_cnt;
+    } else if (tokens[i].type == ')') {
+      --match_cnt;
+    }
+    if (match_cnt < 0) {
+      *error = -1;
+      return false;
+    }
+  }
+  if (match_cnt != 0) {
+    *error = -1;
+    return false;
+  }
+  if (tokens[p].type == '(' && tokens[q].type == ')') {
+    return true;
+  } else {
+    *error = 0;
+    return false;
+  }
+}
+
+
+uint32_t eval(int p, int q, bool *success) {
+  int error;
+  if (p > q) {
+    *success = false;
+    return 0;
+  } 
+  else if (p == q) {
+    uint32_t val;
+    if (tokens[p].type == TK_NUMBER) {
+      int ret;
+      ret = sscanf(tokens[p].str, "%d", &val);
+      if (ret == 0) {
+        *success = false;
+      }
+    } else if (tokens[p].type == TK_HEX) { 
+      int ret;
+      ret = sscanf(tokens[p].str, "%x", &val);
+      if (ret == 0) {
+        *success = false;
+      } 
+    } else if (tokens[p].type == TK_REGISTER) {
+      val = isa_reg_str2val(tokens[p].str + 1, success);
+    }
+    return val;
+  } else if (check_parentheses(p, q, &error)) {
+    return eval(p + 1, q - 1, success);
+  } else {
+    if (error == -1) {
+      *success = false;
+      return 0;
+    }
+
+    uint32_t val1 = 0;
+    if (tokens[op].type != TK_POINTOR && tokens[op].type != TK_MINUS) {
+      val1 = eval(p, op - 1, success);
+    }
+    uint32_t val2 = eval(op + 1, q, success);
+    switch (tokens[op].type) {
+      case '+':
+        return val1 + val2;
+        break;
+      case '-':
+        return val1 - val2;
+        break;
+      case '*':
+        return val1 * val2;
+        break;
+      case '/':
+        if (val2 == 0) {
+          panic("Division by zero!!");
+        }
+        return val1 / val2;
+        break;
+      // TK_POINTOR and TK_MINUS do not support recursive expr evaluation
+      case TK_POINTOR:
+        return vaddr_read(val2, 4);
+        break;
+      case TK_MINUS:
+        return -val2;
+        break;
+      case TK_EQ:
+        return (val1 == val2);
+        break;
+      case TK_NOTEQ:
+        return (val1 != val2);
+        break;
+      case TK_AND:
+        return (val1 && val2);
+        break;
+      case TK_OR:
+        return (val1 || val2);
+        break;
+      default:
+        Log("Unhandled op %s\n", tokens[op].str);
+        assert(0);
+    }
+  }
+}
+
+
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
@@ -103,7 +246,17 @@ uint32_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
-
-  return 0;
+  int i;
+	for (i = 0;i < nr_token; i ++) { //识别负数和指针
+		//printf("REGISTER: %d\n", token[i].type == REGISTER);
+ 		if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != NUMBER && tokens[i - 1].type != HEX && tokens[i - 1].type != REGISTER && tokens[i - 1].type != MARK && tokens[i - 1].type !=')'))) {
+			tokens[i].type = TK_POINTOR;
+		}
+		if (tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != NUMBER && tokens[i - 1].type != HEX && tokens[i - 1].type != REGISTER && tokens[i - 1].type != MARK && tokens[i - 1].type !=')'))) {
+			tokens[i].type = TK_MINUS;
+ 		}
+  }
+	*success = true;
+	//printf("success = %d\n", *success);
+	return eval(0, nr_token-1, success);
 }
