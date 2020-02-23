@@ -91,7 +91,7 @@ typedef struct token {
   int precedence;  // 为设置优先级，此处每个token都应有对应值
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[320] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
