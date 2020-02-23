@@ -12,8 +12,8 @@ enum {
   TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-  TK_NUMBER, TK_REGISTER, TK_MINUS, TK_POINTOR,
-  TK_NOTEQ, TK_AND, TK_OR, TK_HEX
+  TK_NUMBER, TK_REGISTER, TK_MINUS, TK_DEREFERENCE,
+  TK_NOTEQ, TK_AND, TK_OR
 };
 
 static struct rule {
@@ -177,9 +177,13 @@ static bool make_token(char *e) {
   return true;
 }
 
+enum {
+  BAD_EXPR = 1024, NOT_SURROUND
+};
+
 bool check_parentheses(int p, int q, int* error) {
   if (p >= q) {
-    *error = -1;
+    *error = BAD_EXPR;
     return false;
   }
   int match_cnt = 0;
@@ -190,21 +194,22 @@ bool check_parentheses(int p, int q, int* error) {
       --match_cnt;
     }
     if (match_cnt < 0) {
-      *error = -1;
+      *error = BAD_EXPR;
       return false;
     }
   }
   if (match_cnt != 0) {
-    *error = -1;
+    *error = BAD_EXPR;
     return false;
   }
   if (tokens[p].type == '(' && tokens[q].type == ')') {
     return true;
   } else {
-    *error = 0;
+    *error = NOT_SURROUND;
     return false;
   }
 }
+
 
 
 uint32_t eval(int p, int q, bool *success) {
@@ -232,7 +237,7 @@ uint32_t eval(int p, int q, bool *success) {
   } else if (check_parentheses(p, q, &error)) {
     return eval(p + 1, q - 1, success);
   } else {
-    if (error == -1) {
+    if (error == BAD_EXPR) {
       *success = false;
       return 0;
     }
@@ -251,7 +256,7 @@ uint32_t eval(int p, int q, bool *success) {
       }
     }
     uint32_t val1 = 0;
-    if (tokens[op].type != TK_POINTOR && tokens[op].type != TK_MINUS) {
+    if (tokens[op].type != TK_DEREFERENCE && tokens[op].type != TK_MINUS) {
       val1 = eval(p, op - 1, success);
     }
     uint32_t val2 = eval(op + 1, q, success);
@@ -271,8 +276,8 @@ uint32_t eval(int p, int q, bool *success) {
         }
         return val1 / val2;
         break;
-      // TK_POINTOR and TK_MINUS do not support recursive expr evaluation
-      case TK_POINTOR:
+      // TK_DEREFERENCE and TK_MINUS do not support recursive expr evaluation
+      case TK_DEREFERENCE:
         return vaddr_read(val2, 4);
         break;
       case TK_MINUS:
@@ -296,7 +301,6 @@ uint32_t eval(int p, int q, bool *success) {
         assert(0);
     }
   }
-  return -1;
 }
 
 bool check_unary(int token_type) {
@@ -307,9 +311,10 @@ bool check_unary(int token_type) {
     || token_type == '*'
     || token_type == '/'
     || token_type == TK_MINUS
-    || token_type == TK_POINTOR
+    || token_type == TK_DEREFERENCE
   );
 }
+
 
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -320,7 +325,7 @@ uint32_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   for (int i = 0; i < nr_token; ++i) {
     if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
-      tokens[i].type = TK_POINTOR;
+      tokens[i].type = TK_DEREFERENCE;
       tokens[i].precedence = OP_LV2_2;
     }
     if (tokens[i].type == '-' && (i == 0 || check_unary(tokens[i - 1].type))) {
