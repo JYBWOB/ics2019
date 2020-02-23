@@ -27,23 +27,18 @@ static struct rule {
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
-  {"==", TK_EQ},         // equal
-  {"!=", TK_NOTEQ},       // not equal
-  {"&&", TK_AND},       // and
-  {"\\|\\|", TK_OR},    // or
-  {"[0-9]+", TK_NUMBER},       // number
-  {"0[xX][0-9a-fA-F]+", TK_HEX},        // hex number
-  {"\\$(eax|EAX|ebx|EBX|ecx|ECX|edx|EDX|ebp|EBP|esp|ESP|esi|ESI|edi|EDI|eip|EIP)", TK_REGISTER}, // register
-  {"\\$(([ABCD][HLX])|([abcd][hlx]))", TK_REGISTER}, //register
-  {"!", '!'}, // not
-  // {"\\+", '+'}, // add
-  {"\\-", '-'}, // sub
-  {"\\*", '*'}, // mul
-  {"/", '/'}, // div
-  {">", '>'}, // greater
-  {"<", '<'}, // lower
-  {"\\(", '('}, // left bracket
-  {"\\)", ')'} // right bracket  
+  {"\\-", '-'},
+  {"\\*", '*'},
+  {"/", '/'},
+  {"\\(", '('},
+  {"\\)", ')'},
+  {"\\$[a-zA-Z0-9]+", TK_REGISTER},
+  {"0[xX][0-9a-fA-F]+", TK_NUMBER},  // hex
+  {"0|[1-9][0-9]*", TK_NUMBER},
+  {"!=", TK_NOTEQ},
+  {"&&", TK_AND},
+  {"\\|\\|", TK_OR},
+  {"==", TK_EQ}         // equal
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -91,7 +86,7 @@ typedef struct token {
   int precedence;  // 为设置优先级，此处每个token都应有对应值
 } Token;
 
-static Token tokens[320] __attribute__((used)) = {};
+static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -217,21 +212,19 @@ uint32_t eval(int p, int q, bool *success) {
   if (p > q) {
     *success = false;
     return 0;
-  } 
-  else if (p == q) {
+  } else if (p == q) {
     uint32_t val;
     if (tokens[p].type == TK_NUMBER) {
+      bool is_hex = strlen(tokens[p].str) > 2 && (tokens[p].str[1] == 'x' || tokens[p].str[1] == 'X');
       int ret;
-      ret = sscanf(tokens[p].str, "%d", &val);
+      if (is_hex) {
+        ret = sscanf(tokens[p].str, "%x", &val);
+      } else {
+        ret = sscanf(tokens[p].str, "%d", &val);
+      }
       if (ret == 0) {
         *success = false;
       }
-    } else if (tokens[p].type == TK_HEX) { 
-      int ret;
-      ret = sscanf(tokens[p].str, "%x", &val);
-      if (ret == 0) {
-        *success = false;
-      } 
     } else if (tokens[p].type == TK_REGISTER) {
       val = isa_reg_str2val(tokens[p].str + 1, success);
     }
@@ -297,6 +290,7 @@ uint32_t eval(int p, int q, bool *success) {
       case TK_OR:
         return (val1 || val2);
         break;
+
       default:
         Log("Unhandled op %s\n", tokens[op].str);
         assert(0);
@@ -324,17 +318,15 @@ uint32_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  int i;
-	for (i = 0;i < nr_token; i ++) { //识别负数和指针
-		//printf("REGISTER: %d\n", token[i].type == REGISTER);
- 		if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
-			tokens[i].type = TK_POINTOR;
+  for (int i = 0; i < nr_token; ++i) {
+    if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
+      tokens[i].type = TK_POINTOR;
       tokens[i].precedence = OP_LV2_2;
-		}
-		if (tokens[i].type == '-' && (i == 0 || check_unary(tokens[i - 1].type))) {
-			tokens[i].type = TK_MINUS;
+    }
+    if (tokens[i].type == '-' && (i == 0 || check_unary(tokens[i - 1].type))) {
+      tokens[i].type = TK_MINUS;
       tokens[i].precedence = OP_LV2_1;
- 		}
+    }
   }
 	*success = true;
 	return eval(0, nr_token-1, success);
