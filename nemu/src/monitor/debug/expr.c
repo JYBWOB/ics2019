@@ -330,6 +330,7 @@ uint32_t expr(char *e, bool *success) {
   int i;
 	for (i = 0;i < nr_token; i ++) { //识别负数和指针
 		//printf("REGISTER: %d\n", token[i].type == REGISTER);
+    printf(tokens[i].str);
  		if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
 			tokens[i].type = TK_POINTOR;
       tokens[i].precedence = OP_LV2_2;
