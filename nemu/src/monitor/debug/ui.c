@@ -124,7 +124,7 @@ static int cmd_scan(char *args) {
   
 
   bool *e = false;
-  printf("%d\n", expr("(2056810607+(311588048)*((155358798/(1037229738)))*((109528855)))", e));
+  printf("%d\n", expr("(2056810607+(311588048)*((155358798/(1037229738)))*((109528855)))\0", e));
   int result = 0x100000;
   for(int i = 0; i < len; i++)
     printf("%010X\t", vaddr_read(result + i * 4, 4));
