@@ -231,7 +231,7 @@ uint32_t eval(int p, int q, bool *success) {
         *success = false;
       }
     } else if (tokens[p].type == TK_REGISTER) {
-      printf("**********************\n");
+      printf("**********************%s\n", tokens[p].str + 1);
       val = isa_reg_str2val(tokens[p].str + 1, success);
       printf("**********************%x\n", *success);
     }
