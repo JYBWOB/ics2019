@@ -51,10 +51,18 @@ uint32_t isa_reg_str2val(const char *s, bool *success) {
   if (strcmp(s, "pc") == 0) {
     return cpu.pc;
   }
-  // 我们只支持对32位寄存器的查找
   for (int i = 0; i < 8; ++i) {
     if (strcmp(reg_name(i, 4), s) == 0) {
+      *success = true;
       return reg_l(i);
+    }
+    if (strcmp(reg_name(i, 2), s) == 0) {
+      *success = true;
+      return reg_w(i);
+    }
+    if (strcmp(reg_name(i, 1), s) == 0) {
+      *success = true;
+      return reg_b(i);
     }
   }
   *success = false;
