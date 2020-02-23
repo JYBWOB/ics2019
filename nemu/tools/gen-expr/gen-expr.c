@@ -6,9 +6,43 @@
 #include <string.h>
 
 // this should be enough
-static char buf[65536];
+static char buf[65536] = "";
 static inline void gen_rand_expr() {
-  buf[0] = '\0';
+  srand((unsigned)time(NULL));
+
+  int index = 0;
+  char temp[25]; 
+  switch (choose(3)) {
+    case 0:
+      int ran = rand();
+      itoa(ran, temp, 10);
+      strcat(buf, temp);
+      break;
+    case 1: 
+      strcat(buf, '(');
+      gen_rand_expr(); 
+      strcat(buf, ')');
+      break;
+    default:
+      gen_rand_expr(); 
+      int ran = rand() % 4;
+      switch(ran) {
+        case 0:
+          strcat(buf, '+');
+          break;
+        case 1:
+          strcat(buf, '-');
+          break;
+        case 2:
+          strcat(buf, '*');
+          break;
+        default:
+          strcat(buf, '/');
+          break;
+      } 
+      gen_rand_expr(); 
+      break;
+  }
 }
 
 static char code_buf[65536];
