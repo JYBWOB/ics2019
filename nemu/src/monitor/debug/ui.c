@@ -115,7 +115,7 @@ static int cmd_scan(char *args) {
     Log("Expr evaluation failed.");
     assert(0);
   }
-  printf("calculate result: %x", expr_val);
+  printf("calculate result: %x\n", expr_val);
   uint32_t val;
   for (int i = 0; i < scan_num; ++i) {
     val = vaddr_read(expr_val + (i << 2), 4);
