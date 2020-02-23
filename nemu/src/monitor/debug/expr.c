@@ -36,9 +36,9 @@ static struct rule {
   {"\\$(eax|EAX|ebx|EBX|ecx|ECX|edx|EDX|ebp|EBP|esp|ESP|esi|ESI|edi|EDI|eip|EIP)", TK_REGISTER}, // register
   {"\\$(([ABCD][HLX])|([abcd][hlx]))", TK_REGISTER}, //register
   {"!", '!'}, // not
-  // {"+", '+'}, // add
-  {"-", '-'}, // sub
-  {"*", '*'}, // mul
+  // {"\\+", '+'}, // add
+  {"\\-", '-'}, // sub
+  {"\\*", '*'}, // mul
   {"/", '/'}, // div
   {">", '>'}, // greater
   {"<", '<'}, // lower
