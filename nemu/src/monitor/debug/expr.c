@@ -103,7 +103,6 @@ static bool make_token(char *e) {
 
   while (e[position] != '\0') {
     /* Try all rules one by one. */
-    printf("1111");
     for (i = 0; i < NR_REGEX; i ++) {
       if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
         char *substr_start = e + position;
@@ -180,8 +179,6 @@ static bool make_token(char *e) {
       return false;
     }
   }
-
-  printf("everything is ok 2");
   return true;
 }
 
@@ -325,8 +322,6 @@ uint32_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
-  
-    printf("everything is ok 3");
 
   /* TODO: Insert codes to evaluate the expression. */
   int i;

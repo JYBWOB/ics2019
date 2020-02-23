@@ -97,39 +97,30 @@ static int cmd_info(char *args) {
 
 // 扫描内存
 static int cmd_scan(char *args) {
-  // 参数必须存在
-  if(args == NULL)
-	{
-		printf("Unknown size and address to scan\n");
-		return 0;
-	}
-  // 参数的最末位置
-  char* args_end = args + strlen(args);
-  
-  // 截取第一个参数
-  char *size = strtok(args, " ");
-  int len = -1;
-  if(sscanf(size, "%d", &len) == EOF || len < 0) {
-    printf("please input the size to scan\n");
+  char *scan_num_str = strtok(NULL, " ");
+  if (scan_num_str == NULL) {
+    printf("invalid args\nusage: x N address\n");
     return 0;
   }
-  // 判断第二个计算式存在
-  char *addr = size + strlen(size) + 1;
-  if (addr >= args_end) { 
-    printf("Please input the address to scan\n");
+  int scan_num = atoi(scan_num_str);
+  char *expression = scan_num_str + strlen(scan_num_str) + 1;
+  if (expression == NULL) {
+    printf("invalid args\nusage: x N address\n");
     return 0;
   }
-  // TODO: 计算表达式 输出结果
-  // 目前没有实现表达式计算，先以常数地址代替
-  
-
-  bool *e = false;
-  printf("%d\n", expr("(2056810607+(311588048)*((155358798/(1037229738)))*((109528855)))\0", e));
-  int result = 0x100000;
-  for(int i = 0; i < len; i++)
-    printf("%010X\t", vaddr_read(result + i * 4, 4));
+  uint32_t expr_val;
+  bool success = true;
+  expr_val = expr(expression, &success);
+  if (success == false) {
+    Log("Expr evaluation failed.");
+    assert(0);
+  }
+  uint32_t val;
+  for (int i = 0; i < scan_num; ++i) {
+    val = vaddr_read(expr_val + (i << 2), 4);
+    printf("%08x ", val);
+  }
   printf("\n");
-
   return 0;
 }
 
