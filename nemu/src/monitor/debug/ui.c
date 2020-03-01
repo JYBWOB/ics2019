@@ -41,6 +41,9 @@ static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_scan(char *args);
+static int cmd_p(char *args);
+static int cmd_w(char *args);
+static int cmd_d(char *args);
 
 static struct {
   char *name;
@@ -55,6 +58,9 @@ static struct {
   {"si", "Execute N instructions, the default number is 1", cmd_si},
   {"info", "Print the regsters or watchpoints", cmd_info},
   {"x", "Scan the memory to find the value", cmd_scan},
+  {"p", "Delete watchpoint", cmd_p},
+  {"w", "Set watchpoint", cmd_w},
+  {"d", "Delete watchpoint", cmd_d},
 };
 
 /* 单步执行si */
@@ -86,7 +92,7 @@ static int cmd_info(char *args) {
       isa_reg_display();
       break;
     case 'w':
-      printf("Will be implemented in pa1.3\n");
+      wp_display();
       break;
     default:
       printf("Unknown Type to print\n");
@@ -122,6 +128,38 @@ static int cmd_scan(char *args) {
     printf("%08x ", val);
   }
   printf("\n");
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  bool success = true;
+  uint32_t val = expr(args, &success);
+  if (success == false) {
+    printf("Expr evaluation failed.\n");
+    return 0;
+  }
+  printf("%s = 0x%x\n", args, val);
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  bool success = true;
+  uint32_t val = expr(args, &success);
+  if (success == false) {
+    printf("Expr evaluation failed.\n");
+    return 0;    
+  }
+  WP* wp = new_wp();
+  wp->val = val;
+  strcpy(wp->expression, args);
+  Log("wp %d set: %s = 0x%x", wp->NO, wp->expression, wp->val);
+  return 0;
+}
+
+static int cmd_d(char *args) {
+  int NO = atoi(args);
+  WP* wp = wp_no2ptr(NO);
+  free_wp(wp);
   return 0;
 }
 
