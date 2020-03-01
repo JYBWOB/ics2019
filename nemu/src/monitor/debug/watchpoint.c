@@ -63,7 +63,7 @@ void wp_display() {
   }
   printf("Num\tExpr\tValue\n");
   while (curr) {
-    printf("%d\t%s\t0x%x\n", curr->NO, curr->expression, curr->val);
+    printf("%d\t%s\t0x%08x\n", curr->NO, curr->expression, curr->val);
     curr = curr->next;
   }
 }
@@ -77,7 +77,7 @@ bool wp_check() {
     new_val = expr(curr->expression, &success);
     assert(success != false);
     if (new_val != curr->val) {
-      printf("wp %d\t%s = 0x%x != 0x%x\n", curr->NO, curr->expression, curr->val, new_val);
+      printf("wp %d\t%s = 0x%08x != 0x%08x\n", curr->NO, curr->expression, curr->val, new_val);
       return true;
     }
     curr = curr->next;

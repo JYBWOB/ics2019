@@ -121,7 +121,7 @@ static int cmd_scan(char *args) {
     Log("Expr evaluation failed.");
     assert(0);
   }
-  printf("calculate result: %x, \t%d\n", expr_val,expr_val);
+  printf("calculate result: %08x, \t%d\n", expr_val,expr_val);
   uint32_t val;
   for (int i = 0; i < scan_num; ++i) {
     val = vaddr_read(expr_val + (i << 2), 4);
@@ -138,7 +138,7 @@ static int cmd_p(char *args) {
     printf("Expr evaluation failed.\n");
     return 0;
   }
-  printf("%s = 0x%x\n", args, val);
+  printf("%s = 0x%08x\n", args, val);
   return 0;
 }
 
@@ -152,7 +152,7 @@ static int cmd_w(char *args) {
   WP* wp = new_wp();
   wp->val = val;
   strcpy(wp->expression, args);
-  Log("wp %d set: %s = 0x%x", wp->NO, wp->expression, wp->val);
+  Log("wp %d set: %s = 0x%08x", wp->NO, wp->expression, wp->val);
   return 0;
 }
 
