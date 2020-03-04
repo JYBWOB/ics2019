@@ -21,8 +21,10 @@ void init_wp_pool() {
 /* TODO: Implement the functionality of watchpoint */
 WP* new_wp() {
   assert(free_ != NULL);
-  WP* ret = free_;
+  WP* ret = free_; // ret指向可用节点
+  // 更新free
   free_ = free_->next;
+  // 更新head
   ret->next = head;
   head = ret;
   return ret;

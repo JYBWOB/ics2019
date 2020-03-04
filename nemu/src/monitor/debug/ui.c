@@ -103,12 +103,14 @@ static int cmd_info(char *args) {
 
 // 扫描内存
 static int cmd_scan(char *args) {
+  // 获取第一个参数
   char *scan_num_str = strtok(NULL, " ");
   if (scan_num_str == NULL) {
     printf("invalid args\nusage: x N address\n");
     return 0;
   }
   int scan_num = atoi(scan_num_str);
+  // 第二个参数，表达式字符串
   char *expression = scan_num_str + strlen(scan_num_str) + 1;
   if (expression == NULL) {
     printf("invalid args\nusage: x N address\n");
@@ -116,12 +118,14 @@ static int cmd_scan(char *args) {
   }
   uint32_t expr_val;
   bool success = true;
+  // 计算表达式
   expr_val = expr(expression, &success);
   if (success == false) {
     Log("Expr evaluation failed.");
     assert(0);
   }
-  printf("calculate result: %08x, \t%d\n", expr_val,expr_val);
+  // printf("calculate result: %08x, \t%d\n", expr_val,expr_val);
+  // 连续输出
   uint32_t val;
   for (int i = 0; i < scan_num; ++i) {
     val = vaddr_read(expr_val + (i << 2), 4);

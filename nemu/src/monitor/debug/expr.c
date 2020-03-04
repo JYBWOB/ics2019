@@ -183,9 +183,10 @@ enum {
 
 bool check_parentheses(int p, int q, int* error) {
   if (p >= q) {
-    *error = BAD_EXPR;
+    *error = BAD_EXPR; // 枚举变量，标识错误
     return false;
   }
+  // match_cnt标记了左括号-右括号数量差值
   int match_cnt = 0;
   for (int i = p; i <= q; ++i) {
     if (tokens[i].type == '(') {
@@ -193,11 +194,13 @@ bool check_parentheses(int p, int q, int* error) {
     } else if (tokens[i].type == ')') {
       --match_cnt;
     }
+    // 该值在从左向右扫描时，不可能为负数
     if (match_cnt < 0) {
       *error = BAD_EXPR;
       return false;
     }
   }
+  // 若括号匹配，则为0
   if (match_cnt != 0) {
     *error = BAD_EXPR;
     return false;
@@ -220,6 +223,7 @@ uint32_t eval(int p, int q, bool *success) {
   } else if (p == q) {
     uint32_t val;
     if (tokens[p].type == TK_NUMBER) {
+      // 判断是否是16进制数
       bool is_hex = strlen(tokens[p].str) > 2 && (tokens[p].str[1] == 'x' || tokens[p].str[1] == 'X');
       int ret;
       if (is_hex) {
@@ -230,17 +234,19 @@ uint32_t eval(int p, int q, bool *success) {
       if (ret == 0) {
         *success = false;
       }
-    } else if (tokens[p].type == TK_REGISTER) {
+    } else if (tokens[p].type == TK_REGISTER) { // 寄存器变量则范围寄存器值
       val = isa_reg_str2val(tokens[p].str + 1, success);
     }
     return val;
-  } else if (check_parentheses(p, q, &error)) {
+  } else if (check_parentheses(p, q, &error)) { // 判断是否被括号包围
     return eval(p + 1, q - 1, success);
   } else {
-    if (error == BAD_EXPR) {
+    if (error == BAD_EXPR) { // 表达式有错，计算失败
       *success = false;
       return 0;
     }
+    // 根据优先级，找出优先级最低的，
+    // 也就是precedence数值最大的
     int op = 0;
     int cur = 0;
     int max_precedence = -1;
@@ -255,6 +261,7 @@ uint32_t eval(int p, int q, bool *success) {
         op = i;
       }
     }
+    // 不是特殊的-号和*号，则递归计算
     uint32_t val1 = 0;
     if (tokens[op].type != TK_DEREFERENCE && tokens[op].type != TK_MINUS) {
       val1 = eval(p, op - 1, success);
@@ -276,7 +283,7 @@ uint32_t eval(int p, int q, bool *success) {
         }
         return val1 / val2;
         break;
-      // TK_DEREFERENCE and TK_MINUS do not support recursive expr evaluation
+      // TK_DEREFERENCE 和 TK_MINUS不支持递归计算
       case TK_DEREFERENCE:
         return vaddr_read(val2, 4);
         break;
@@ -324,10 +331,12 @@ uint32_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
   for (int i = 0; i < nr_token; ++i) {
+    // 指针解引用
     if (tokens[i].type == '*' && (i == 0 || check_unary(tokens[i - 1].type))) {
       tokens[i].type = TK_DEREFERENCE;
       tokens[i].precedence = OP_LV2_2;
     }
+    // 负数
     if (tokens[i].type == '-' && (i == 0 || check_unary(tokens[i - 1].type))) {
       tokens[i].type = TK_MINUS;
       tokens[i].precedence = OP_LV2_1;
