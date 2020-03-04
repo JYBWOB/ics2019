@@ -34,19 +34,24 @@ void free_wp(WP *wp) {
   assert(wp != NULL);
   assert(head != NULL);
   if(head == wp) {
+    // 如果wp为第一个，则直接设置为空
     head = NULL;
   }
   else {
+    // 否则逐个寻找
     WP* prev = head;
     while(prev->next != wp) {
       prev = prev->next;
     }
+    // 链接跳过wp
     prev->next = wp->next;
   }
+  // 更新free
   wp->next = free_;
   free_ = wp;
 }
 
+// 根据wp获取其NO值
 WP* wp_no2ptr(int NO) {
   WP* ret = NULL;
   WP* curr = head;
@@ -57,6 +62,7 @@ WP* wp_no2ptr(int NO) {
   return ret;
 }
 
+// 输出所有监视点的信息
 void wp_display() {
   WP* curr = head;
   if (curr == NULL) {
@@ -70,6 +76,7 @@ void wp_display() {
   }
 }
 
+// 检查各个监视点是否有变化
 bool wp_check() {
   WP* curr = head;
   bool success;
