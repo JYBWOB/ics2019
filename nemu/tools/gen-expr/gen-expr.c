@@ -6,8 +6,12 @@
 #include <string.h>
 
 // this should be enough
-static char buf[3000] = "";
-static inline void gen_rand_expr() {
+static char buf[300] = "";
+static inline int gen_rand_expr() {
+  if (strlen(buf) > 280) {
+    return 0;
+  }
+  int result = 1;
   switch (rand() % 3) {
     case 0: {
       char temp[25]; 
@@ -18,12 +22,12 @@ static inline void gen_rand_expr() {
     }
     case 1: { 
       strcat(buf, "(");
-      gen_rand_expr(); 
+      result = gen_rand_expr(); 
       strcat(buf, ")");
       break;
     }
     default: {
-      gen_rand_expr(); 
+      int resule1 = gen_rand_expr(); 
       int ran = rand() % 4;
       switch(ran) {
         case 0:
@@ -39,10 +43,12 @@ static inline void gen_rand_expr() {
           strcat(buf, "/");
           break;
       } 
-      gen_rand_expr(); 
+      int result2 = gen_rand_expr(); 
+      result = resule1 && result2;
       break;
     }
   }
+  return result;
 }
 
 static char code_buf[65536];
@@ -64,7 +70,9 @@ int main(int argc, char *argv[]) {
   int i;
   for (i = 0; i < loop; i ++) {
     buf[0] = '\0';
-    gen_rand_expr();
+    if(0 == gen_rand_expr()) {
+      continue;
+    }
 
     sprintf(code_buf, code_format, buf);  
 
@@ -84,6 +92,7 @@ int main(int argc, char *argv[]) {
     pclose(fp);
 
     printf("%u %s\n", result, buf);
+
   }
   return 0;
 }
