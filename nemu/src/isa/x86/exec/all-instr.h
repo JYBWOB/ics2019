@@ -21,3 +21,6 @@ make_EHelper(sub);
 
 // system.c
 make_EHelper(in);
+
+// logic.c
+make_EHelper(xor);

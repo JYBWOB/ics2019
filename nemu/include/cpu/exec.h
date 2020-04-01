@@ -10,6 +10,9 @@ typedef void (*EHelper) (vaddr_t *);
 
 #include "cpu/decode.h"
 
+
+rtlreg_t t0, t1, t2, t3;
+
 typedef struct {
   DHelper decode;
   EHelper execute;
