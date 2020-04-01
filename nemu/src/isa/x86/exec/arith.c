@@ -7,7 +7,6 @@ make_EHelper(add) {
 }
 
 make_EHelper(sub) {
-  printf("suddeed!\n");
   rtlreg_t t0, t1, t2, t3;
   rtl_sext(&t1, &id_dest->val, id_dest->width);
 	rtl_sext(&t2, &id_src->val, id_src->width);
