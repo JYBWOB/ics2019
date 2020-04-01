@@ -88,7 +88,6 @@ static inline make_DopHelper(O) {
   if (load_val) {
     rtl_lm(&op->val, &op->addr, op->width);
   }
-printf("succeeddd2");
   print_Dop(op->str, OP_STR_SIZE, "0x%x", op->addr);
 }
 
@@ -167,7 +166,6 @@ make_DHelper(I) {
 
 make_DHelper(r) {
   decode_op_r(pc, id_dest, true);
-  printf("succeeddd1");
 }
 
 make_DHelper(E) {
@@ -188,7 +186,6 @@ make_DHelper(test_I) {
 }
 
 make_DHelper(SI2E) {
-  printf("suddeeddd");
   assert(id_dest->width == 2 || id_dest->width == 4);
   decode_op_rm(pc, id_dest, true, NULL, false);
   id_src->width = 1;
