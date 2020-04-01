@@ -18,3 +18,6 @@ make_EHelper(push);
 
 // arith.c
 make_EHelper(sub);
+
+// system.c
+make_EHelper(in);
