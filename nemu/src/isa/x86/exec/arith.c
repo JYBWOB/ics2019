@@ -7,7 +7,17 @@ make_EHelper(add) {
 }
 
 make_EHelper(sub) {
-  TODO();
+  rtlreg_t t0, t1, t2, t3;
+  rtl_sext(&t1, &id_dest->val, id_dest->width);
+	rtl_sext(&t2, &id_src->val, id_src->width);
+
+	rtl_sub(&t0, &t1, &t2);
+	t3 = (t0 > t1);
+	rtl_set_CF(&t3);
+	t3 = ((((int32_t)(t1) < 0) == (((int32_t)(t2) >> 31) == 0)) && (((int32_t)(t0) < 0) != ((int32_t)(t1) < 0))); // 负正得正 正负得负
+	rtl_set_OF(&t3);
+	rtl_update_ZFSF(&t0, 4);
+	operand_write(id_dest, &t0);
 
   print_asm_template2(sub);
 }

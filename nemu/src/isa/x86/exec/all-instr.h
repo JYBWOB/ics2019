@@ -14,3 +14,7 @@ make_EHelper(call);
 
 // data-mov.c
 make_EHelper(push);
+
+
+// arith.c
+make_EHelper(sub);

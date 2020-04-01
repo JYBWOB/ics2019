@@ -23,16 +23,32 @@ typedef struct {
       uint16_t _16;
       uint8_t _8[2];
     } gpr[8];
-
+    struct {
+      rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    };
+    };
       /* Do NOT change the order of the GPRs' definitions. */
 
       /* In NEMU, rtlreg_t is exactly uint32_t. This makes RTL instructions
       * in PA2 able to directly access these registers.
       */
-    struct {
-      rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    union {
+      struct {
+        uint8_t CF  :   1;
+        uint8_t DEF1:	  1;
+        uint8_t DEF2:	  4;
+        uint8_t ZF  :   1;
+        uint8_t SF  :   1;
+        uint8_t DEF3:   1;
+        uint8_t IF  :   1;
+        uint8_t DEF4:   1;
+        uint8_t OF  :   1;
+        uint32_t DEF5:  20;
+      } eflags;
+      uint32_t flags;
     };
-  };
+
+    
 
   vaddr_t pc;
 
