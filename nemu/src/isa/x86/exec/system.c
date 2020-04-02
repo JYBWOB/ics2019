@@ -46,9 +46,15 @@ make_EHelper(in) {
   rtlreg_t t0;
   switch(id_src->width)
 	{
-		case 1: t0 = pio_read_b(id_src->val); break;
-		case 2: t0 = pio_read_w(id_src->val); break;
-		case 4: t0 = pio_read_l(id_src->val); break;
+		case 1: 
+      t0 = pio_read_b(id_src->val); 
+      break;
+		case 2: 
+      t0 = pio_read_w(id_src->val); 
+      break;
+		case 4: 
+      t0 = pio_read_l(id_src->val); 
+      break;
 	}
 	operand_write(id_dest, &t0);
 
