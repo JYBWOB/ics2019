@@ -28,6 +28,7 @@ make_EHelper(popa);
 make_EHelper(mov_cr2r);
 make_EHelper(mov_r2cr);
 make_EHelper(cltd);
+make_EHelper(cwtl);
 
 
 // arith.c

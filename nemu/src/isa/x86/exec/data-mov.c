@@ -86,10 +86,12 @@ make_EHelper(cltd) {
 
 make_EHelper(cwtl) {
   if (decinfo.isa.is_operand_size_16) {
-    TODO();
+    rtl_sext(&s0, &reg_l(R_EAX), 1);
+    rtl_mv(&reg_l(R_EAX), &s0);
   }
   else {
-    TODO();
+    rtl_sext(&s0,&reg_l(R_EAX),2);
+    rtl_mv(&reg_l(R_EAX),&s0);
   }
 
   print_asm(decinfo.isa.is_operand_size_16 ? "cbtw" : "cwtl");
