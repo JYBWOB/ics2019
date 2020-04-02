@@ -33,6 +33,7 @@ make_EHelper(sbb);
 make_EHelper(add);
 make_EHelper(cmp);
 make_EHelper(inc);
+make_EHelper(dec);
 
 // system.c
 make_EHelper(in);
