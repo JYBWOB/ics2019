@@ -2,12 +2,17 @@
 #include <amdev.h>
 #include <nemu.h>
 
+#define RTC_PORT 0x48
+
+uint32_t r_time;
+
 size_t __am_timer_read(uintptr_t reg, void *buf, size_t size) {
   switch (reg) {
     case _DEVREG_TIMER_UPTIME: {
       _DEV_TIMER_UPTIME_t *uptime = (_DEV_TIMER_UPTIME_t *)buf;
       uptime->hi = 0;
-      uptime->lo = 0;
+      // uptime->lo = 0;
+      uptime->lo = inl(0x48)-r_time;
       return sizeof(_DEV_TIMER_UPTIME_t);
     }
     case _DEVREG_TIMER_DATE: {
@@ -25,4 +30,5 @@ size_t __am_timer_read(uintptr_t reg, void *buf, size_t size) {
 }
 
 void __am_timer_init() {
+  r_time = inl(RTC_PORT);
 }
