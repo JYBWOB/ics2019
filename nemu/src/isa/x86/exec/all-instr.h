@@ -14,6 +14,7 @@ make_EHelper(ret);
 
 // data-mov.c
 make_EHelper(push);
+make_EHelper(lea);
 
 
 // arith.c
