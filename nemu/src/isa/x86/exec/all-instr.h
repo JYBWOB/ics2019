@@ -42,7 +42,9 @@ make_EHelper(mul);
 make_EHelper(imul);
 make_EHelper(imul1);
 make_EHelper(imul2);
+make_EHelper(div);
 make_EHelper(idiv);
+make_EHelper(neg);
 
 // system.c
 make_EHelper(in);
