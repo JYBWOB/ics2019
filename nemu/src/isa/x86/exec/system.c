@@ -56,7 +56,19 @@ make_EHelper(in) {
 }
 
 make_EHelper(out) {
-  TODO();
+  // TODO();
+  switch(id_dest->width) {
+    case 4: 
+      pio_write_l(id_dest->val, id_src->val); 
+      break;
+    case 2: 
+      pio_write_w(id_dest->val, id_src->val); 
+      break;
+    case 1: 
+      pio_write_b(id_dest->val, id_src->val); 
+      break;
+    default: assert(0);
+  }
 
   print_asm_template2(out);
 }

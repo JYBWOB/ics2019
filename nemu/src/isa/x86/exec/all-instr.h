@@ -48,6 +48,7 @@ make_EHelper(neg);
 
 // system.c
 make_EHelper(in);
+make_EHelper(out);
 
 // logic.c
 make_EHelper(xor);
