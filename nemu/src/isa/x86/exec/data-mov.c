@@ -17,19 +17,46 @@ make_EHelper(push) {
 }
 
 make_EHelper(pop) {
-  TODO();
+  // TODO();	
+  rtl_pop(&t0);
+
+	if(id_dest->width == 1){
+		uint8_t utemp = t0;
+		int8_t temp = utemp;
+		id_dest->val = temp;
+	}
+	else
+	  	id_dest->val = t0;
+	operand_write(id_dest, &id_dest->val);
 
   print_asm_template1(pop);
 }
 
 make_EHelper(pusha) {
-  TODO();
+  // TODO();
+  t0 = cpu.esp;
+	rtl_push(&cpu.eax);
+	rtl_push(&cpu.ecx);
+	rtl_push(&cpu.edx);
+	rtl_push(&cpu.ebx);
+	rtl_push(&t0);
+	rtl_push(&cpu.ebp);
+	rtl_push(&cpu.esi);
+	rtl_push(&cpu.edi);
 
   print_asm("pusha");
 }
 
 make_EHelper(popa) {
-  TODO();
+  // TODO();
+  rtl_pop(&cpu.edi);
+	rtl_pop(&cpu.esi);
+	rtl_pop(&cpu.ebp);
+	rtl_pop(&t0);
+	rtl_pop(&cpu.ebx);
+	rtl_pop(&cpu.edx);
+	rtl_pop(&cpu.ecx);
+	rtl_pop(&cpu.eax);
 
   print_asm("popa");
 }
