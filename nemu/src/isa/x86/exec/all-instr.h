@@ -38,6 +38,7 @@ make_EHelper(dec);
 make_EHelper(imul);
 make_EHelper(imul1);
 make_EHelper(imul2);
+make_EHelper(idiv);
 
 // system.c
 make_EHelper(in);
