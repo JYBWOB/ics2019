@@ -43,21 +43,20 @@ void pio_write_b(ioaddr_t, uint32_t);
 
 make_EHelper(in) {
   // TODO();
-  rtlreg_t t0;
-  switch(id_src->width)
-	{
-		case 1: 
-      t0 = pio_read_b(id_src->val); 
+  switch(id_dest->width) {
+    case 4: 
+      rtl_li(&s0, pio_read_l(id_src->val)); 
       break;
-		case 2: 
-      t0 = pio_read_w(id_src->val); 
+    case 2: 
+      rtl_li(&s0, pio_read_w(id_src->val)); 
       break;
-		case 4: 
-      t0 = pio_read_l(id_src->val); 
+    case 1: 
+      rtl_li(&s0, pio_read_b(id_src->val)); 
       break;
-	}
-	operand_write(id_dest, &t0);
-
+    default: assert(0);
+  }
+  operand_write(id_dest, &s0);
+  
   print_asm_template2(in);
 }
 
@@ -75,6 +74,5 @@ make_EHelper(out) {
       break;
     default: assert(0);
   }
-
   print_asm_template2(out);
 }
