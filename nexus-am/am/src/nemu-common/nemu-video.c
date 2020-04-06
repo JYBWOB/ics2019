@@ -13,9 +13,11 @@ size_t __am_video_read(uintptr_t reg, void *buf, size_t size) {
   switch (reg) {
     case _DEVREG_VIDEO_INFO: {
       _DEV_VIDEO_INFO_t *info = (_DEV_VIDEO_INFO_t *)buf;
-      uint32_t screen_info = inl(SCREEN_PORT);
-      info->width = screen_info>>16;
-      info->height = screen_info&0xffff;
+      // uint32_t screen_info = inl(SCREEN_PORT);
+      // info->width = screen_info>>16;
+      // info->height = screen_info&0xffff;
+      info->width = 0;
+      info->height = 0;
       return sizeof(_DEV_VIDEO_INFO_t);
     }
   }
