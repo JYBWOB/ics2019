@@ -13,7 +13,6 @@
 /* You will define this macro in PA2 */
 
 // IO输入输出要打开这个宏！！！！！！！
-// 太气人了
 #define HAS_IOE
 
 #include <stdint.h>
