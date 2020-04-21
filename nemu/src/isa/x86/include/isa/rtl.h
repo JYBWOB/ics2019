@@ -23,7 +23,7 @@ static inline void rtl_sr(int r, const rtlreg_t* src1, int width) {
   }
 }
 
-void rtl_push(const rtlreg_t* src1) {
+static void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
   // M[esp] <- src1
   cpu.esp -= 4;
