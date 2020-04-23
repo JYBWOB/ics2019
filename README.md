@@ -1,17 +1,15 @@
-# ICS2019 Programming Assignment
+# 项目介绍
 
-This project is the programming assignment of the class ICS(Introduction to Computer System) in Department of Computer Science and Technology, Nanjing University.
+南开大学计算机学院2020年第一学期“综合课程设计”课程作业任务---ICS2019
 
-For the guide of this programming assignment,
-refer to http://nju-ics.gitbooks.io/ics2019-programming-assignment/content/
+# 1710218 姜奕兵 计算机科学与技术
 
-To initialize, run
-```bash
-bash init.sh
-```
+# 当前分支完成情况
 
-The following subprojects/components are included. Some of them are not fully implemented.
-* [NEMU](https://github.com/NJU-ProjectN/nemu)
-* [Nexus-am](https://github.com/NJU-ProjectN/nexus-am)
-* [Nanos-lite](https://github.com/NJU-ProjectN/nanos-lite)
-* [Navy-apps](https://github.com/NJU-ProjectN/navy-apps)
+- [x] pa0
+- [x] pa1
+- [ ] pa2
+- [ ] pa3
+- [ ] pa4
+- [ ] pa5
+- [ ] pa6
