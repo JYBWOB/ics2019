@@ -34,29 +34,54 @@ make_EHelper(pop) {
 
 make_EHelper(pusha) {
   // TODO();
-  t0 = cpu.esp;
-	rtl_push(&cpu.eax);
-	rtl_push(&cpu.ecx);
-	rtl_push(&cpu.edx);
-	rtl_push(&cpu.ebx);
-	rtl_push(&t0);
-	rtl_push(&cpu.ebp);
-	rtl_push(&cpu.esi);
-	rtl_push(&cpu.edi);
+  if (decinfo.isa.is_operand_size_16) {
+		t0 = reg_w(R_SP);
+		rtl_push((rtlreg_t *)&reg_w(R_AX));
+		rtl_push((rtlreg_t *)&reg_w(R_CX));
+		rtl_push((rtlreg_t *)&reg_w(R_DX));
+		rtl_push((rtlreg_t *)&reg_w(R_BX));
+		rtl_push((rtlreg_t *)&t0);
+		rtl_push((rtlreg_t *)&reg_w(R_BP));
+		rtl_push((rtlreg_t *)&reg_w(R_SI));
+		rtl_push((rtlreg_t *)&reg_w(R_DI));
+	}
+  else { 
+		t0 = reg_l(R_ESP);
+		rtl_push(&reg_l(R_EAX));
+		rtl_push(&reg_l(R_ECX));
+		rtl_push(&reg_l(R_EDX));
+		rtl_push(&reg_l(R_EBX));
+		rtl_push(&t0);
+		rtl_push(&reg_l(R_EBP));
+		rtl_push(&reg_l(R_ESI));
+		rtl_push(&reg_l(R_EDI)); 
+  }
 
   print_asm("pusha");
 }
 
 make_EHelper(popa) {
   // TODO();
-  rtl_pop(&cpu.edi);
-	rtl_pop(&cpu.esi);
-	rtl_pop(&cpu.ebp);
-	rtl_pop(&t0);
-	rtl_pop(&cpu.ebx);
-	rtl_pop(&cpu.edx);
-	rtl_pop(&cpu.ecx);
-	rtl_pop(&cpu.eax);
+  if (decinfo.isa.is_operand_size_16) {
+		rtl_pop((rtlreg_t *)&reg_w(R_DI));
+		rtl_pop((rtlreg_t *)&reg_w(R_SI));
+		rtl_pop((rtlreg_t *)&reg_w(R_BP));
+		rtl_pop(&t0);
+		rtl_pop((rtlreg_t *)&reg_w(R_BX));
+		rtl_pop((rtlreg_t *)&reg_w(R_DX));
+		rtl_pop((rtlreg_t *)&reg_w(R_CX));
+		rtl_pop((rtlreg_t *)&reg_w(R_AX));
+	}
+  else { 
+		rtl_pop(&reg_l(R_EDI));
+		rtl_pop(&reg_l(R_ESI));
+		rtl_pop(&reg_l(R_EBP));
+		rtl_pop(&t0);
+		rtl_pop(&reg_l(R_EBX));
+		rtl_pop(&reg_l(R_EDX));
+		rtl_pop(&reg_l(R_ECX));
+		rtl_pop(&reg_l(R_EAX));
+  }
 
   print_asm("popa");
 }
