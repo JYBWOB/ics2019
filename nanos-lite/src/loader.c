@@ -15,16 +15,21 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   // TODO();
+  printf("111111111111");
   Elf_Ehdr ehdr;
   ramdisk_read((void *)&ehdr, 0, sizeof(Elf_Ehdr));
+  printf("22222222222");
   for (size_t i = 0; i < ehdr.e_phnum; ++i) {
     Elf_Phdr phdr;
     ramdisk_read((void *)&phdr, ehdr.e_ehsize, sizeof(Elf_Phdr)*i);
     if (phdr.p_type == PT_LOAD) {
+      printf("33333333333");
       ramdisk_read((void *)phdr.p_vaddr, phdr.p_offset, phdr.p_memsz);
-      // memset((void *)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
+      memset((void *)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
     }
+    printf("444444444444444");
   }
+  printf("55555555555555");
   return ehdr.e_entry;
 }
 
