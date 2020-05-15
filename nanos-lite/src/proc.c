@@ -28,6 +28,7 @@ void init_proc() {
 
   // load program here
   naive_uload(NULL, "/bin/pal");
+  printf("1111111111");
 
 }
 
