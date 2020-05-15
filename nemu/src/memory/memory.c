@@ -12,7 +12,7 @@ static IOMap pmem_map = {
 void register_pmem(paddr_t base) {
   pmem_map.low = base;
   pmem_map.high = base + PMEM_SIZE - 1;
-
+  Log("111111111111111111: %s", pmem_map.name);
   Log("Add '%s' at [0x%08x, 0x%08x]", pmem_map.name, pmem_map.low, pmem_map.high);
 }
 
@@ -26,7 +26,6 @@ uint32_t paddr_read(paddr_t addr, int len) {
     return *(uint32_t *)(pmem + offset) & (~0u >> ((4 - len) << 3));
   }
   else {
-    printf("222222222");
     return map_read(addr, len, fetch_mmio_map(addr));
   }
 }
