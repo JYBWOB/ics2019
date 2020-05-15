@@ -36,7 +36,7 @@ char* get_ch(char *dest, int num, int n) {
 }
 
 int printf(const char *fmt, ...) {
-  va_list ap;
+	va_list ap;
   	va_start(ap,fmt);
   	int sum=0;
   	int i=0;
@@ -96,101 +96,50 @@ int printf(const char *fmt, ...) {
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
-  char c;
-  char *str = out;
-  const char *tmp;
-  char num_s[100];
-  int i,j,len,num;
-  int flag,field_width;
-
-  for(;*fmt; fmt++)
-  {
-      if(*fmt != '%')
-      {
-	  *str++ = *fmt;
-	  continue;
-      }
-
-      flag = 0;
-      fmt++;
-      while(*fmt == ' ' || *fmt == '0')
-      {
-	if(*fmt == ' ')  flag |= 8;
-	else if(*fmt == '0') flag |= 1;
-	fmt++;
-      }
-
-      field_width = 0;
-      if(*fmt >= '0' && *fmt <= '9')
-      {
-	      while(*fmt >= '0' && *fmt <= '9')
-	      {
-		      field_width = field_width*10 + *fmt -'0';
-		      fmt++;
-	      }
-      }
-      else if(*fmt == '*')
-      {
-	      fmt++;
-	      field_width = va_arg(ap,int);
-      }
-      switch(*fmt)
-      {
-	  case 's':
-	      tmp = va_arg(ap,char *);
-	      len = strlen(tmp);
-	      for(i = 0;i < len;i ++)
-	      {
-		   *str++ = *tmp++;
-	      }
-	      continue;
-	  case 'd': break;
-      }
-
-      num = va_arg(ap,int);
-      j = 0;
-      if(num == 0)
-      {
-	  num_s[j++] = '0';
-      }
-      else
-      {
-	  if(num < 0)
-	  {
-	      *str++ = '-';
-	      num = -num;
-	  }
-	  while(num)
-	  {
-	      num_s[j++] = num%10 + '0';
-	      num /= 10;
-	  }
-      }
-      if(j < field_width)
-      {
-	      num = field_width - j;
-	      c = flag & 1 ? '0' : ' ';
-	      while(num--)
-	      {
-		      *str++ = c;
-	      }
-      }
-      while(j--)
-      {
-	  *str++ = num_s[j];
-      }
-  }
-  *str = '\0';
   return 0;
 }
 
+
 int sprintf(char *out, const char *fmt, ...) {
-  va_list args;
-  int  val;
-  va_start(args,fmt);
-  val = vsprintf(out,fmt,args);
-  va_end(args);
-  return val;
+  va_list ap;
+  va_start(ap,fmt);
+  int sum=0;
+  int i=0;
+  int len=strlen(fmt);
+  out[0]='\0';
+  while(i<len) {
+    if(fmt[i]=='%') {
+      int num=0;
+      char ls[50]="";
+      switch(fmt[i+1]) {
+        case 'd': {
+	  		num=va_arg(ap,int);
+	  		get_ch(ls, num, 10);
+	  		strcat(out,ls);
+	  		sum+=strlen(ls);	
+        } break;
+		case 's': {
+	  		strcpy(ls,va_arg(ap, char*));
+	  		strcat(out,ls);
+	  		sum += strlen(ls);
+		} break;
+		default: {
+			printf("sprintf fault \n");
+		}
+	  } 
+      i+=2;
+	}
+    else {
+      	sum++;
+      	char s[2];
+      	s[0]=fmt[i];
+      	s[1]='\0';
+      	strcat(out,s);
+      	i++;
+  	}
+ }
+  va_end(ap);
+  return sum; 
 }
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
