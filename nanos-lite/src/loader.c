@@ -25,19 +25,16 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       memset((void *)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
     }
   }
+  printf("1111111111");
+
   return ehdr.e_entry;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
-  printf("1111111111");
-
   uintptr_t entry = loader(pcb, filename);
 
-  printf("2222222222");
   Log("Jump to entry = %x", entry);
-  printf("3333333333");
   ((void(*)())entry) ();
-  printf("44444444444");
 }
 
 void context_kload(PCB *pcb, void *entry) {
