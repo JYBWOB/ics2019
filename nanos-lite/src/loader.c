@@ -15,16 +15,23 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   // TODO();
+  int fd = fs_open(filename, 0, 0);
+  if (fd == -1) {
+    panic("loader failed");
+  }
   Elf_Ehdr ehdr;
-  ramdisk_read(&ehdr, 0, sizeof(Elf_Ehdr));
-  Elf_Phdr phdr[ehdr.e_phnum];
-  ramdisk_read(phdr, ehdr.e_ehsize, sizeof(Elf_Phdr)*ehdr.e_phnum);
-  for (size_t i = 0; i < ehdr.e_phnum; i++) {
-    if (phdr[i].p_type == PT_LOAD) {
-      ramdisk_read((void *)phdr[i].p_vaddr, phdr[i].p_offset, phdr[i].p_memsz);
-      memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
+  fs_read(fd, (void *)&ehdr, sizeof(Elf_Ehdr));
+  for (size_t i = 0; i < ehdr.e_phnum; ++i) {
+    Elf_Phdr phdr;
+    fs_lseek(fd, ehdr.e_phoff + ehdr.e_phentsize * i, SEEK_SET);
+    fs_read(fd, (void *)&phdr, ehdr.e_phentsize);
+    if (phdr.p_type == PT_LOAD) {
+      fs_lseek(fd, phdr.p_offset, SEEK_SET);
+      fs_read(fd, (void *)phdr.p_vaddr, phdr.p_filesz);
+      memset((void *)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
     }
   }
+  fs_close(fd);
   return ehdr.e_entry;
 }
 
