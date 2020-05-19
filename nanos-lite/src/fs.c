@@ -32,7 +32,12 @@ static Finfo file_table[] __attribute__((used)) = {
   {"stdin", 0, 0, 0, invalid_read, invalid_write},
   {"stdout", 0, 0, 0, invalid_read, invalid_write},
   {"stderr", 0, 0, 0, invalid_read, invalid_write},
+  // {"/dev/fb", 0, 0, 0, invalid_read, fb_write},
 #include "files.h"
+  // {"/proc/dispinfo", 0, 0, 0, dispinfo_read, invalid_write},
+  // {"/dev/fbsync", 0, 0, 0, invalid_read, fbsync_write},
+  // {"/dev/events", 0, 0, 0, events_read, invalid_write},
+  // {"/dev/tty", 0, 0, 0, invalid_read, serial_write},
 };
 
 #define NR_FILES (sizeof(file_table) / sizeof(file_table[0]))
