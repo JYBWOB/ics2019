@@ -55,6 +55,7 @@ int fs_open(const char *pathname, int flags, int mode){
       return i;
     }
   }
+  panic("pathname not correct\n");
   return -1;
 }
 
