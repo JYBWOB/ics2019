@@ -29,6 +29,7 @@ void draw_rect(uint32_t *pixels, int x, int y, int w, int h) {
 }
 
 void draw_sync() {
+  printf("111111111111\n");
   _DEV_VIDEO_FBCTL_t ctl;
   ctl.pixels = NULL;
   ctl.x = ctl.y = ctl.w = ctl.h = 0;
