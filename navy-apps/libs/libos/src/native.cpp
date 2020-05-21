@@ -31,9 +31,12 @@ static uint32_t buf[640 * 480];
 static bool fbdev_opened = false;
 
 static void draw_sync() {
+  printf("111111111111111\n");
   if (fbdev_opened) {
     if (shm_fd < 0) return;
+    printf("2222222222222222\n");
     lseek(shm_fd, 0, SEEK_SET);
+    printf("3333333333333333\n");
     int nread = read(shm_fd, buf, W * H * 4);
     for (int i = 0; i < W * H; i ++) {
       fb[i] = buf[i];
