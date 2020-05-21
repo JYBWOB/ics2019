@@ -20,6 +20,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Ehdr ehdr;
   Elf_Phdr phdr;
   fs_direct_read(fd, &ehdr, 0, ehdr_sz);
+  printf("1111111111111111111");
   for(int i=0; i<ehdr.e_phnum; i++) {
     fs_direct_read(fd, &phdr, ehdr.e_phoff + i*ehdr.e_phentsize, ehdr.e_phentsize);
     if(phdr.p_type != PT_LOAD) continue;
@@ -27,6 +28,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     // printf("phdr vaddr: %d, offset: %d, filesz: %d, memsz: %d\n", phdr.p_vaddr, phdr.p_offset, phdr.p_filesz, phdr.p_memsz);
     memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
   }  
+  printf("2222222222222222");
   return ehdr.e_entry;
 }
 
