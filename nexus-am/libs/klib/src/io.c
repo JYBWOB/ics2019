@@ -29,12 +29,12 @@ void draw_rect(uint32_t *pixels, int x, int y, int w, int h) {
 }
 
 void draw_sync() {
-  printf("111111111111\n");
   _DEV_VIDEO_FBCTL_t ctl;
   ctl.pixels = NULL;
   ctl.x = ctl.y = ctl.w = ctl.h = 0;
   ctl.sync = 1;
   _io_write(_DEV_VIDEO, _DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
+  printf("1111111111111111\n");
 }
 
 int screen_width() {
