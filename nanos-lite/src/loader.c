@@ -16,29 +16,24 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 static uintptr_t loader(PCB *pcb, const char *filename) {
   // TODO();
   int fd = fs_open(filename, 0, 0);
-  if (fd == -1) {
-    panic("loader failed");
-  }
+  int ehdr_sz = sizeof(Elf_Ehdr);
   Elf_Ehdr ehdr;
-  fs_read(fd, (void *)&ehdr, sizeof(Elf_Ehdr));
-  for (size_t i = 0; i < ehdr.e_phnum; ++i) {
-    Elf_Phdr phdr;
-    fs_lseek(fd, ehdr.e_phoff + ehdr.e_phentsize * i, SEEK_SET);
-    fs_read(fd, (void *)&phdr, ehdr.e_phentsize);
-    if (phdr.p_type == PT_LOAD) {
-      fs_lseek(fd, phdr.p_offset, SEEK_SET);
-      fs_read(fd, (void *)phdr.p_vaddr, phdr.p_filesz);
-      memset((void *)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
-    }
-  }
-  fs_close(fd);
+  Elf_Phdr phdr;
+  fs_direct_read(fd, &ehdr, 0, ehdr_sz);
+  for(int i=0; i<ehdr.e_phnum; i++) {
+    fs_direct_read(fd, &phdr, ehdr.e_phoff + i*ehdr.e_phentsize, ehdr.e_phentsize);
+    if(phdr.p_type != PT_LOAD) continue;
+    fs_direct_read(fd, (void*)(phdr.p_vaddr), phdr.p_offset, phdr.p_filesz);
+    printf("phdr vaddr: %d, offset: %d, filesz: %d, memsz: %d\n", phdr.p_vaddr, phdr.p_offset, phdr.p_filesz, phdr.p_memsz);
+    memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
+  }  
   return ehdr.e_entry;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
   uintptr_t entry = loader(pcb, filename);
 
-  Log("Jump to entry = %x\n", entry);
+  Log("Jump to entry = %x", entry);
   ((void(*)())entry) ();
 }
 
