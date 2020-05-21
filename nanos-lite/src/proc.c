@@ -28,8 +28,8 @@ void init_proc() {
 
   // load program here
   // naive_uload(NULL, NULL);
-  naive_uload(NULL, "/bin/hello");
-  Log("proc finished!!!!!!!!!!!!!!!!!!!!");
+  naive_uload(NULL, "/bin/text");
+  // Log("proc finished!!!!!!!!!!!!!!!!!!!!");
 }
 
 _Context* schedule(_Context *prev) {
