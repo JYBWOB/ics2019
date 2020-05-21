@@ -12,7 +12,6 @@ static IOMap pmem_map = {
 void register_pmem(paddr_t base) {
   pmem_map.low = base;
   pmem_map.high = base + PMEM_SIZE - 1;
-
   Log("Add '%s' at [0x%08x, 0x%08x]", pmem_map.name, pmem_map.low, pmem_map.high);
 }
 
