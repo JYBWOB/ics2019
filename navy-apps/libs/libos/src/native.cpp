@@ -31,6 +31,7 @@ static uint32_t buf[640 * 480];
 static bool fbdev_opened = false;
 
 static void draw_sync() {
+  printf("11111111111111\n");
   if (fbdev_opened) {
     if (shm_fd < 0) return;
     lseek(shm_fd, 0, SEEK_SET);

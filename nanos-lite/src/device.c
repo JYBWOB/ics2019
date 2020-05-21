@@ -75,9 +75,7 @@ size_t fb_write(const void *buf, size_t offset, size_t len) {
 }
 
 size_t fbsync_write(const void *buf, size_t offset, size_t len) {
-  printf("11111111111111111\n");
   draw_sync();
-  printf("222222222222222222\n");
   return 0;
 }
 
