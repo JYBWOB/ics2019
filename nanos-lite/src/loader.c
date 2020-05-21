@@ -15,14 +15,11 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   // TODO();
-  printf("55555555555555555\n");
   int fd = fs_open(filename, 0, 0);
-  printf("66666666666666666\n");
   int ehdr_sz = sizeof(Elf_Ehdr);
   Elf_Ehdr ehdr;
   Elf_Phdr phdr;
   fs_direct_read(fd, &ehdr, 0, ehdr_sz);
-  printf("777777777777777777\n");
   for(int i=0; i<ehdr.e_phnum; i++) {
     fs_direct_read(fd, &phdr, ehdr.e_phoff + i*ehdr.e_phentsize, ehdr.e_phentsize);
     if(phdr.p_type != PT_LOAD) continue;
@@ -30,7 +27,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     printf("phdr vaddr: %d, offset: %d, filesz: %d, memsz: %d\n", phdr.p_vaddr, phdr.p_offset, phdr.p_filesz, phdr.p_memsz);
     memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
   }  
-  printf("88888888888888888\n");
   return ehdr.e_entry;
 }
 
