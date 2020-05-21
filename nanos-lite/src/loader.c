@@ -31,6 +31,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     // printf("phdr vaddr: %d, offset: %d, filesz: %d, memsz: %d\n", phdr.p_vaddr, phdr.p_offset, phdr.p_filesz, phdr.p_memsz);
     memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
   }  
+  printf("555555555555555\n");
   return ehdr.e_entry;
 }
 
