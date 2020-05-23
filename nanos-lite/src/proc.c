@@ -29,7 +29,6 @@ void init_proc() {
   // load program here
   // naive_uload(NULL, NULL);
   naive_uload(NULL, "/bin/pal");
-  // Log("proc finished!!!!!!!!!!!!!!!!!!!!");
 }
 
 _Context* schedule(_Context *prev) {
