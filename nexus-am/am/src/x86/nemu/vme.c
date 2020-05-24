@@ -93,12 +93,11 @@ int _map(_AddressSpace *as, void *va, void *pa, int prot) {
 
 _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, void *args) {
   // return NULL;
-    uintptr_t* tp = ustack.end - 3 * sizeof(uintptr_t);
-    *(tp) = *(tp + 1) = *(tp + 2) = 0;
-    _Context* tmp = ustack.end - 3 * sizeof(uintptr_t) - sizeof(_Context);
-    tmp->cs = 0x8;
-    tmp->eip = (uintptr_t)entry;
-    tmp->as = as;
-    tmp->eflags |= 0x200;
-    return tmp;
+  uintptr_t* tp = ustack.end - 3 * sizeof(uintptr_t);
+  *(tp) = *(tp + 1) = *(tp + 2) = 0;
+  _Context* tmp = ustack.end - 3 * sizeof(uintptr_t) - sizeof(_Context);
+  tmp->cs = 0x8;
+  tmp->eip = (uintptr_t)entry;
+  tmp->as = as;
+  return tmp;
 }
