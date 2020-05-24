@@ -5,8 +5,10 @@
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
 PCB *current = NULL;
+PCB* fg_pcb = &pcb[1];
 
 void naive_uload(PCB *pcb, const char *filename);
+void context_kload(PCB* pcb, void* entry);
 
 void switch_boot_pcb() {
   current = &pcb_boot;
@@ -22,15 +24,28 @@ void hello_fun(void *arg) {
 }
 
 void init_proc() {
+  context_kload(&pcb[0], (void*)hello_fun);
   switch_boot_pcb();
 
   Log("Initializing processes...");
 
   // load program here
-  // naive_uload(NULL, NULL);
-  naive_uload(NULL, "/bin/bmptest");
+  // naive_uload(NULL, "/bin/init");
 }
 
+int cnt = 0;
 _Context* schedule(_Context *prev) {
-  return NULL;
+  // return NULL;
+  current->cp = prev;
+  //current = &pcb[1];
+  //current = (current == &pcb[0] ? fg_pcb : &pcb[0]);
+  if (current == &pcb[0]) current = fg_pcb;
+  else if(cnt!=100){
+      ++cnt;
+      current = fg_pcb;
+  } else {
+      cnt = 0;
+      current = &pcb[0];
+  }
+  return current->cp;
 }
