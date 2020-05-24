@@ -11,7 +11,7 @@ void raise_intr(uint32_t NO, vaddr_t ret_addr) {
   rtl_push((rtlreg_t *)&cpu.eflags.value);
   rtl_push((rtlreg_t *)&cpu.cs);
   rtl_push((rtlreg_t *)&ret_addr);
-  if(NO==IRQ_TIMER)
+  // if(NO==IRQ_TIMER)
     cpu.eflags.IF = 0;
   uint32_t low = vaddr_read(cpu.idtr.base + 8 * NO, 4);
   uint32_t high = vaddr_read(cpu.idtr.base + 8 * NO + 4, 4);
