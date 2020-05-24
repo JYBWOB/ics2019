@@ -41,6 +41,6 @@ _Context* schedule(_Context *prev) {
   // return NULL;
   current->cp = prev;
   // current = &pcb[0];
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  // current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
   return current->cp;
 }
