@@ -44,3 +44,8 @@ _Context* schedule(_Context *prev) {
     current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
     return current->cp;
 }
+
+void load_for_execve(const char* filename)
+{
+    naive_uload(current, filename);
+}

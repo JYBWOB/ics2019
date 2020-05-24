@@ -5,6 +5,7 @@
 
 void naive_uload(PCB *pcb, const char *filename);
 int mm_brk(uintptr_t brk, intptr_t increment);
+void load_for_execve(const char* filename);
 
 static inline int32_t sys_write(int fd, void *buf, size_t len) {
   if (fd==1 || fd==2) {
@@ -16,7 +17,7 @@ static inline int32_t sys_write(int fd, void *buf, size_t len) {
 }
 
 static inline int32_t sys_execve(const char *pathname, char *const argv[], char *const envp[]) {
-  naive_uload(NULL, pathname);
+  load_for_execve(pathname);
   return 0;
 }
 
