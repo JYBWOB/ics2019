@@ -1,6 +1,8 @@
 #include "common.h"
 #include <amdev.h>
 
+void change_fg(int key);
+
 size_t serial_write(const void *buf, size_t offset, size_t len) {
   // _yield();
   for (size_t i = 0; i < len; ++i)
@@ -26,6 +28,8 @@ size_t events_read(void *buf, size_t offset, size_t len) {
       key ^= 0x8000;
       down = 1;
     }
+    if (key == _KEY_F1 || key == _KEY_F2 || key == _KEY_F3)
+      change_fg(key);
     if (key != _KEY_NONE) {
       if(down) {
         sprintf(buf, "kd %s\n", keyname[key]);
