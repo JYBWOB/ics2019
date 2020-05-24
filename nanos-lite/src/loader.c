@@ -13,8 +13,8 @@
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
-static uintptr_t loader(PCB *pcb, const char *filename) {
-  // TODO();
+static uintptr_t loader(PCB* pcb, const char* filename)
+{
   int fd = fs_open(filename, 'r', 0);
   Elf_Ehdr E_hdr;
   Elf_Phdr P_hdr;
@@ -42,8 +42,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
         _map(&pcb->as, vaddr + i, paddr, 0);
         memset(paddr, 0, sz);
       }
-      uintptr_t tmp = PGROUNDUP((uint32_t)vaddr + i);
-      pcb->max_brk = (pcb->max_brk > tmp) ? pcb->max_brk : tmp;
+      pcb->max_brk = PGROUNDUP((uint32_t)vaddr + i);
     }
   }
   fs_close(fd);
