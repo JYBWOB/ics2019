@@ -46,7 +46,7 @@ int cnt = 0;
 _Context* schedule(_Context *prev) {
   current->cp = prev;
   //current = &pcb[1];
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  current = (current == &pcb[0] ? fg_pcb : &pcb[0]);
   // if(current==&pcb[0])
   //   current = &pcb[1];
   // else if(cnt==10){
