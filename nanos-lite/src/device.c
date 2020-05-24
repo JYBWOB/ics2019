@@ -2,6 +2,7 @@
 #include <amdev.h>
 
 size_t serial_write(const void *buf, size_t offset, size_t len) {
+  _yield();
   for (size_t i = 0; i < len; ++i)
     _putc(((char *)buf)[i]);
   return len;
@@ -16,6 +17,7 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t offset, size_t len) {
+  _yield();
   int i=0;
   while(i<len) {
     int key = read_key();
@@ -53,6 +55,7 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
+  _yield();
   int l = len;
   int w = screen_width();
   int h = screen_height();
