@@ -15,18 +15,38 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   // TODO();
-  int fd = fs_open(filename, 0, 0);
-  int ehdr_sz = sizeof(Elf_Ehdr);
-  Elf_Ehdr ehdr;
-  Elf_Phdr phdr;
-  fs_direct_read(fd, &ehdr, 0, ehdr_sz);
-  for(int i=0; i<ehdr.e_phnum; i++) {
-    fs_direct_read(fd, &phdr, ehdr.e_phoff + i*ehdr.e_phentsize, ehdr.e_phentsize);
-    if(phdr.p_type != PT_LOAD) continue;
-    fs_direct_read(fd, (void*)(phdr.p_vaddr), phdr.p_offset, phdr.p_filesz);
-    memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);
-  }  
-  return ehdr.e_entry;
+  int fd = fs_open(filename, 'r', 0);
+  Elf_Ehdr E_hdr;
+  Elf_Phdr P_hdr;
+  fs_read(fd, &E_hdr, sizeof(Elf_Ehdr));
+
+  for (int i = 0; i < E_hdr.e_phnum; i++) {
+    fs_lseek(fd, E_hdr.e_phoff + i * E_hdr.e_phentsize, SEEK_SET);
+    fs_read(fd, &P_hdr, E_hdr.e_phentsize);
+    if (P_hdr.p_type == PT_LOAD) {
+      fs_lseek(fd, P_hdr.p_offset, SEEK_SET);
+      void* vaddr = (void*)P_hdr.p_vaddr;
+      uint32_t i = 0;
+      for (; i < P_hdr.p_filesz; i += PGSIZE) {
+        void* paddr = new_page(1);
+        uint32_t sz = (P_hdr.p_filesz - i >= PGSIZE) ? PGSIZE : (P_hdr.p_filesz - i);
+        _map(&pcb->as, vaddr + i, paddr, 0);
+        fs_read(fd, paddr, sz);
+      }
+      vaddr = vaddr + i;
+      i = 0;
+      uint32_t zero_size = P_hdr.p_memsz - P_hdr.p_filesz;
+      for (; i < zero_size;i += PGSIZE){
+        void* paddr = new_page(1);
+        uint32_t sz = (zero_size - i >= PGSIZE) ? PGSIZE : (zero_size - i);
+        _map(&pcb->as, vaddr + i, paddr, 0);
+        memset(paddr, 0, sz);
+      }
+      pcb->max_brk = PGROUNDUP((uint32_t)vaddr + i);
+    }
+  }
+  fs_close(fd);
+  return E_hdr.e_entry;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {

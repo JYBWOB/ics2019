@@ -80,15 +80,22 @@ void __am_switch(_Context *c) {
 }
 
 int _map(_AddressSpace *as, void *va, void *pa, int prot) {
+  // return 0;
+  PDE t_pde = ((PDE*)as->ptr)[PDX(va)];
+  if (!(t_pde & PTE_P))
+    t_pde = ((PDE*)as->ptr)[PDX(va)] = (uint32_t)pgalloc_usr(1) | PTE_P;
+  ((PTE*)PTE_ADDR(t_pde))[PTX(va)] = PTE_ADDR(pa) | PTE_P;
   return 0;
 }
 
 _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, void *args) {
   // return NULL;
-  uintptr_t* tp = ustack.end - 3 * sizeof(uintptr_t);
-  *(tp) = *(tp + 1) = *(tp + 2) = 0;
-  _Context* tmp = ustack.end - 3 * sizeof(uintptr_t) - sizeof(_Context);
-  tmp->cs = 0x8;
-  tmp->eip = (uintptr_t)entry;
-  return tmp;
+    uintptr_t* tp = ustack.end - 3 * sizeof(uintptr_t);
+    *(tp) = *(tp + 1) = *(tp + 2) = 0;
+    _Context* tmp = ustack.end - 3 * sizeof(uintptr_t) - sizeof(_Context);
+    tmp->cs = 0x8;
+    tmp->eip = (uintptr_t)entry;
+    tmp->as = as;
+    tmp->eflags |= 0x200;
+    return tmp;
 }
