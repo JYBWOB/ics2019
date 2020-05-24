@@ -11,6 +11,9 @@ void naive_uload(PCB *pcb, const char *filename);
 void context_kload(PCB* pcb, void* entry);
 void context_uload(PCB* pcb, const char* filename);
 
+
+int cnt;
+
 void switch_boot_pcb() {
   current = &pcb_boot;
 }
@@ -39,10 +42,19 @@ void init_proc() {
 
 int cnt = 0;
 _Context* schedule(_Context *prev) {
-    current->cp = prev;
-    //current = &pcb[1];
-    current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
-    return current->cp;
+  current->cp = prev;
+  //current = &pcb[1];
+  // current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  if(current==&pcb[0])
+    current = &pcb[1];
+  else if(cnt==10){
+    cnt = 0;
+    current = &pcb[1];
+  }
+  else{
+    cnt++;
+  }
+  return current->cp;
 }
 
 void load_for_execve(const char* filename)
