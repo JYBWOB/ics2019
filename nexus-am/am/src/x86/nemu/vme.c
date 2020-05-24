@@ -81,11 +81,14 @@ void __am_switch(_Context *c) {
 
 int _map(_AddressSpace *as, void *va, void *pa, int prot) {
   // return 0;
-  PDE t_pde = ((PDE*)as->ptr)[PDX(va)];
-  if (!(t_pde & PTE_P))
-    t_pde = ((PDE*)as->ptr)[PDX(va)] = (uint32_t)pgalloc_usr(1) | PTE_P;
-  ((PTE*)PTE_ADDR(t_pde))[PTX(va)] = PTE_ADDR(pa) | PTE_P;
-  return 0;
+    PDE t_pde = ((PDE*)as->ptr)[PDX(va)];
+    if (!(t_pde & PTE_P)) {
+        t_pde = ((PDE*)as->ptr)[PDX(va)] = (uint32_t)pgalloc_usr(1) | PTE_P;
+    }
+    if (!((PTE*)PTE_ADDR(t_pde))[PTX(va)] & PTE_P) {
+        ((PTE*)PTE_ADDR(t_pde))[PTX(va)] = PTE_ADDR(pa) | PTE_P;
+    }
+    return 0;
 }
 
 _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, void *args) {
