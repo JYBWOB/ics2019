@@ -4,12 +4,18 @@
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
   // assert(0);
-  return (a * b) >> 16;
+  float result = a * b;
+  for(int i = 0; i < 16; i++)
+    result /= 2;
+  return (int)result;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
   // assert(0);
-  return (a / b) << 16;
+  float result = a / b;
+  for(int i = 0; i < 16; i++)
+    result *= 2;
+  return (int)result;
 }
 
 FLOAT f2F(float a) {

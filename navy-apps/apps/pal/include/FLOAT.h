@@ -7,26 +7,26 @@ typedef int FLOAT;
 
 static inline int F2int(FLOAT a) {
   // assert(0);
-  int result = a >> 16;
-  return result;
+  for(int i = 0; i < 16; i++)
+    a /= 2;
+  return a;
 }
 
 static inline FLOAT int2F(int a) {
   // assert(0);
-  FLOAT result = a << 16;
-  return result;
+  for(int i = 0; i < 16; i++)
+    a *= 2;
+  return a;
 }
 
 static inline FLOAT F_mul_int(FLOAT a, int b) {
   // assert(0);
   return a * b;
-  return 0;
 }
 
 static inline FLOAT F_div_int(FLOAT a, int b) {
   // assert(0);
   return a / b;
-  return 0;
 }
 
 FLOAT f2F(float);
