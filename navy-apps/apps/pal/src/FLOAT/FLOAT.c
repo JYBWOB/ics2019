@@ -30,9 +30,13 @@ FLOAT f2F(float a) {
    */
 
   // assert(0);
+  int flag = (a >= 0 ? 0 : 1);
   for(int i = 0; i < 16; i++)
     a *= 2;
-  return (int)a;
+  if(flag) {
+    a = 0x100000000 - a;
+  }
+  return (FLOAT)a;
 }
 
 FLOAT Fabs(FLOAT a) {

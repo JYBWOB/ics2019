@@ -7,15 +7,25 @@ typedef int FLOAT;
 
 static inline int F2int(FLOAT a) {
   // assert(0);
+  int flag = 0;
+  if((0x80000000 & a) == 1) {
+    flag = 1;
+    a = 0x100000000 - a;
+  }
   for(int i = 0; i < 16; i++)
     a /= 2;
+  if(flag)
+    return -a;
   return a;
 }
 
 static inline FLOAT int2F(int a) {
   // assert(0);
+  int flag = (a >= 0 ? 0 : 1);
   for(int i = 0; i < 16; i++)
     a *= 2;
+  if(flag)
+    return 0x100000000 - a;
   return a;
 }
 
