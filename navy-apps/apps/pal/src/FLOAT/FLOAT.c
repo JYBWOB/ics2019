@@ -3,13 +3,19 @@
 #include <assert.h>
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
-  assert(0);
-  return 0;
+  // assert(0);
+  float result = a * b;
+  for(int i = 0; i < 16; i++)
+    result /= 2;
+  return (int)result;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
-  assert(0);
-  return 0;
+  // assert(0);
+  float result = a / b;
+  for(int i = 0; i < 16; i++)
+    result *= 2;
+  return (int)result;
 }
 
 FLOAT f2F(float a) {
@@ -23,13 +29,22 @@ FLOAT f2F(float a) {
    * performing arithmetic operations on it directly?
    */
 
-  assert(0);
-  return 0;
+  // assert(0);
+  int flag = (a >= 0 ? 0 : 1);
+  for(int i = 0; i < 16; i++)
+    a *= 2;
+  if(flag) {
+    a = 0x100000000 - a;
+  }
+  return (FLOAT)a;
 }
 
 FLOAT Fabs(FLOAT a) {
-  assert(0);
-  return 0;
+  // assert(0);
+  if((0x80000000 & a) == 1)
+    return 0x100000000 - a;
+  else 
+    return a;
 }
 
 /* Functions below are already implemented */
