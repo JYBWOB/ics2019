@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <assert.h>
 
+static inline int F_is_positive(FLOAT a);
+
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
   // assert(0);
   FLOAT result = (Fabs(a) >> 8) * (Fabs(b) >> 8);
