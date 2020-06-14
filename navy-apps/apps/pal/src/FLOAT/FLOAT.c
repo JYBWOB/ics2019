@@ -4,20 +4,23 @@
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
   // assert(0);
-  float result = a * b;
-  for(int i = 0; i < 16; i++)
-    result /= 2;
-  return (int)result;
+  FLOAT result = (Fabs(a) >> 8) * (Fabs(b) >> 8);
+  if(F_is_positive(a) && !F_is_positive(b) || !F_is_positive(a) && F_is_positive(b)) {
+    result |= 0x80000000;
+  }  
+  return result;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
   // assert(0);
-  float result = a / b;
-  for(int i = 0; i < 16; i++)
-    result *= 2;
-  return (int)result;
+  FLOAT result = Fabs(a) / Fabs(b) * (1<<16);
+  if(F_is_positive(a) && !F_is_positive(b) || !F_is_positive(a) && F_is_positive(b)) {
+    result |= 0x80000000;
+  }  
+  return result;
 }
 
+// 此函数参考1711352 李煦阳同学的代码
 FLOAT f2F(float a) {
   /* You should figure out how to convert `a' into FLOAT without
    * introducing x87 floating point instructions. Else you can
@@ -30,21 +33,27 @@ FLOAT f2F(float a) {
    */
 
   // assert(0);
-  int flag = (a >= 0 ? 0 : 1);
-  for(int i = 0; i < 16; i++)
-    a *= 2;
-  if(flag) {
-    a = 0x100000000 - a;
-  }
-  return (FLOAT)a;
+  uint32_t ui = *(uint32_t*)&a;
+  // 符号位
+  uint32_t sign = ui >> 31;
+  // 指数
+  uint32_t exp = (ui >> 23) & 0xff;
+  int res = ui & 0x7fffff; // 取fraction
+  // 浮点数表示中省略了一个1
+  if (exp != 0)  
+      res += 1 << 23;
+  exp -= 150; // 将re有效位完全以整数看待, 算出它的2指数
+  if (exp < -16)  // 以16为分界, 找到移位即可.
+      res >>= -16 - exp;  // 去掉低于16位的位数
+  if (exp > -16)
+      res <<= exp + 16;  // 没有考虑溢出. 
+  return sign == 0 ? res : -res;
 }
 
 FLOAT Fabs(FLOAT a) {
   // assert(0);
-  if((0x80000000 & a) == 1)
-    return 0x100000000 - a;
-  else 
-    return a;
+  a &= 0x7fffffff;
+  return a;
 }
 
 /* Functions below are already implemented */

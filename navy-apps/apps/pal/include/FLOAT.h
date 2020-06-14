@@ -5,38 +5,43 @@
 
 typedef int FLOAT;
 
+static inline int F_is_positive(FLOAT a) {
+  return (a & 0x80000000) == 0;
+}
+
 static inline int F2int(FLOAT a) {
   // assert(0);
-  int flag = 0;
-  if((0x80000000 & a) == 1) {
-    flag = 1;
-    a = 0x100000000 - a;
+  int result = Fabs(a) / (1<<16);
+  if(a & 0x80000000 != 0) {
+    result |= 0x80000000;
   }
-  for(int i = 0; i < 16; i++)
-    a /= 2;
-  if(flag)
-    return -a;
-  return a;
+  return result;
 }
 
 static inline FLOAT int2F(int a) {
   // assert(0);
-  int flag = (a >= 0 ? 0 : 1);
-  for(int i = 0; i < 16; i++)
-    a *= 2;
-  if(flag)
-    return 0x100000000 - a;
-  return a;
+  int result = Fabs(a) * (1<<16);
+  if(a < 0) 
+    result = result | 0x80000000;
+  return result;
 }
 
 static inline FLOAT F_mul_int(FLOAT a, int b) {
   // assert(0);
-  return a * b;
+  int result = Fabs(a) * (b>=0?b:-b);
+  if(F_is_positive(a) && b <0 || !F_is_positive(a) && b>0) {
+    result |= 0x80000000;
+  }
+  return result;
 }
 
 static inline FLOAT F_div_int(FLOAT a, int b) {
   // assert(0);
-  return a / b;
+  int result = Fabs(a) / (b>=0?b:-b);
+  if(F_is_positive(a) && b <0 || !F_is_positive(a) && b>0) {
+    result |= 0x80000000;
+  }
+  return result;
 }
 
 FLOAT f2F(float);
