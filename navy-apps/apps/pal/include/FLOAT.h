@@ -22,7 +22,7 @@ static inline FLOAT int2F(int a) {
   // assert(0);
   int result = Fabs(a) * (1<<16);
   if(a < 0) 
-    result = result | 0x80000000;
+    result = result & 0x80000000;
   return result;
 }
 
